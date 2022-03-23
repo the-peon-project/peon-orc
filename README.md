@@ -20,7 +20,7 @@ Completely useless at this point
 
 ### 0.1.3-dev
 - Deployed with ``python:3.9-slim-bullseye`` as base image
-- Using ``flaskrestful`` as a framework to handle the API.
+- Using ``flask-restful`` as a framework to handle the API.
 #### Known Bugs
 
 ### Architecture/Rules
