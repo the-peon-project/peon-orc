@@ -18,7 +18,7 @@ Completely useless at this point
 
 ## Version Info
 
-### 0.1.1-dev
+### 0.1.3-dev
 - Deployed with ``python:3.9-slim-bullseye`` as base image
 - Using ``flask-restful`` as a framework to handle the API.
 #### Known Bugs
