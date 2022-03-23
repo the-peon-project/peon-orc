@@ -4,11 +4,11 @@
 ### [Peon Project](https://github.com/nox-noctua-consulting/peon)
 An **OpenSource** project to assist gamers in self deploying/managing game servers.\
 Intended to be a one-stop-shop for game server deployment/management.\
-If run on a public/paid cloud, it is architected to try minimise costs (easy schedule/manage uptime vs downtime)\
+If run on a public/paid cloud, it is architected to try minimise costs (easy schedule/manage uptime vs downtime)
 
 ### Peon Orchestrator (peon.orc)
 
-This is the repo for developing the peon server orchestrator.
+The [github](https://github.com/nox-noctua-consulting/peon-orc/) repo for developing the peon server orchestrator.
 
 ## State
 
