@@ -22,7 +22,6 @@ class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("title", type=str, location="json")
         self.reqparse.add_argument("game_id", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
         self.reqparse.add_argument("password", type=str, location="json")
