@@ -8,7 +8,7 @@ servers = []
 # Schema For the Server Request JSON
 serverFields = {
     "id": fields.Integer,
-    "game_id": fields.String,
+    "game_uid": fields.String,
     "servername": fields.String,
     "password": fields.String,
     "state": fields.String
@@ -18,7 +18,7 @@ class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("game_id", type=str, location="json")
+        self.reqparse.add_argument("game_uid", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
         self.reqparse.add_argument("password", type=str, location="json")
         self.reqparse.add_argument("state", type=str, location="json")
@@ -59,7 +59,7 @@ class ServerList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            "game_id", type=str, required=True, help="The PEON game id must be provided", location="json")
+            "game_uid", type=str, required=True, help="The PEON game id must be provided", location="json")
         self.reqparse.add_argument(
             "servername", type=str, required=True, help="A custom server name must be provided", location="json")
         self.reqparse.add_argument(
@@ -72,7 +72,7 @@ class ServerList(Resource):
         args = self.reqparse.parse_args()
         server = {
             "id": servers[-1]['id'] + 1 if len(servers) > 0 else 1,
-            "game_id": args["game_id"],
+            "game_uid": args["game_id"],
             "servername": args["servername"],
             "password": args["password"]
         }
