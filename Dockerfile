@@ -9,5 +9,7 @@ RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
 RUN apt-get update && apt-get -y install procps ssh 
 # Copy application files into container
 COPY ./app /app
+# Set docker host IP
+ENV DOCKER_HOST ssh://172.20.0.1:22
 # Start the app called api
 CMD ["python3", "/app/orchestrator.py"]
