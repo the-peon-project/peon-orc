@@ -6,7 +6,7 @@ COPY ./requirements.txt /app/requirements.txt
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
 # Install tools for 'ps'
-RUN apt-get update && apt-get install procps -y
+RUN apt-get update && apt-get -y install procps ssh 
 # Copy application files into container
 COPY ./app /app
 # Start the app called api
