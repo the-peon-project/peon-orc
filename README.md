@@ -1,7 +1,9 @@
 # PEON - Orchestrator
+
 ## The Easy Game Server Manager
 
 ### [Peon Project](https://github.com/nox-noctua-consulting/peon)
+
 An **OpenSource** project to assist gamers in self deploying/managing game servers.\
 Intended to be a one-stop-shop for game server deployment/management.\
 If run on a public/paid cloud, it is architected to try minimise costs (easy schedule/manage uptime vs downtime)
@@ -19,8 +21,11 @@ Completely useless at this point
 ## Version Info
 
 ### 0.1.2-dev
+
 - Deployed with ``python:3.9-slim-bullseye`` as base image
+
 - Using ``flask-restful`` as a framework to handle the API.
+
 #### Known Bugs
 
 ### Architecture/Rules
