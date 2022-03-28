@@ -1,3 +1,4 @@
+import logging
 from xmlrpc.client import Server
 from flask import Flask
 from flask_restful import Api
@@ -13,4 +14,5 @@ api_v1.add_resource(Server, "/api/1.0/servers/<int:id>")
 
 # Start flask listener
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    app.run(host="0.0.0.0", port=5000, debug=True)
