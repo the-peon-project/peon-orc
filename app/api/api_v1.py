@@ -52,9 +52,7 @@ class Server(Resource):
         if(len(server) == 0):
             abort(404)
         servers.remove(server[0])
-        return 201
-
-
+        return 201 
 class ServerList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -72,7 +70,7 @@ class ServerList(Resource):
         args = self.reqparse.parse_args()
         server = {
             "id": servers[-1]['id'] + 1 if len(servers) > 0 else 1,
-            "game_uid": args["game_id"],
+            "game_uid": args["game_uid"],
             "servername": args["servername"],
             "password": args["password"]
         }
