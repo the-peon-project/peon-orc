@@ -1,6 +1,4 @@
-from flask import Flask
-from flask_restful import Resource, Api, reqparse, abort, marshal, fields
-
+from flask_restful import Resource, reqparse, abort, marshal, fields
 
 # A List of Dicts to store all of the servers
 servers = []
@@ -57,11 +55,11 @@ class ServerList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            "game_uid", type=str, required=True, help="The PEON game id must be provided", location="json")
+            "game_uid", type=str, required=True, help="The PEON game id must be provided.", location="json")
         self.reqparse.add_argument(
-            "servername", type=str, required=True, help="A custom server name must be provided", location="json")
+            "servername", type=str, required=True, help="A custom server name must be provided.", location="json")
         self.reqparse.add_argument(
-            "password", type=str, required=True, help="A custom server password must be provided", location="json")
+            "password", type=str, required=True, help="A custom server password must be provided.", location="json")
 
     def get(self):
         return{"servers": [marshal(server, serverFields) for server in servers]}
