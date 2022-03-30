@@ -20,11 +20,11 @@ Completely useless at this point
 
 ## Version Info
 
-### 0.1.2-dev
+### 0.1.4-dev
 
 - Deployed with ``python:3.9-slim-bullseye`` as base image
-
 - Using ``flask-restful`` as a framework to handle the API.
+- Using ``docker-py`` for container management
 
 #### Known Bugs
 
