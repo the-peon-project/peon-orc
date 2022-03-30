@@ -8,7 +8,7 @@ RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
 # Install required tools
 RUN apt-get update && apt-get -y install ssh
 # TEMP: Install debug tools
-RUN apt-get update && apt-get -y install procps iputils-ping dnsutils
+RUN apt-get update && apt-get -y install procps iputils-ping dnsutils vim
 # Copy application files into container
 COPY ./app /app
 # Set docker host IP
