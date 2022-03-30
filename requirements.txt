@@ -2,3 +2,4 @@ pipenv
 flask
 flask-restful
 docker
+paramiko
