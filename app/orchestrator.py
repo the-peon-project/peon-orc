@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import logging
 #from xmlrpc.client import Server
 from flask import Flask

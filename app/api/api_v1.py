@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from flask_restful import Resource, reqparse, abort, marshal, fields
 
 # A List of Dicts to store all of the servers
