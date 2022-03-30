@@ -52,7 +52,7 @@ class Server(Resource):
             abort(404)
         servers.remove(server[0])
         return 201 
-class ServerList(Resource):
+class Servers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(

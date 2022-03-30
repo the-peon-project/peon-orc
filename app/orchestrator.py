@@ -4,15 +4,15 @@ import logging
 from flask import Flask
 from flask_restful import Api
 # Import Peon Modules
-from api.api_v1 import ServerList, Server
+from api.api_v1 import Servers, Server
 from actions.servers import *
 
 # Initialize Flask
 app = Flask(__name__)
 api_v1 = Api(app)
 
-api_v1.add_resource(ServerList, "/api/1.0/servers")
-api_v1.add_resource(Server, "/api/1.0/servers/<int:id>")
+api_v1.add_resource(Servers, "/api/1.0/servers")
+api_v1.add_resource(Server, "/api/1.0/server/<int:id>")
 
 # Start flask listener
 if __name__ == "__main__":
