@@ -16,7 +16,7 @@ def server_stop(server_uid):
     container = client.containers.get("{0}{1}".format(prefix,server_uid))
     container.stop()
 
-# Start flask listener
+# MAIN - for dev purposes
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     server_start("csgo.server01")
