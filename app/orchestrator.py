@@ -4,8 +4,8 @@ import logging
 from flask import Flask
 from flask_restful import Api
 # Import Peon Modules
-from api.api_v1 import Servers, Server
-from actions.servers import *
+
+from modules.api_v1 import Servers, Server
 
 # Initialize Flask
 app = Flask(__name__)
