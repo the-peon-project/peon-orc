@@ -16,6 +16,6 @@ def server_stop(client,serverid):
 
 # Start flask listener
 if __name__ == "__main__":
-    logging.basicConfig(filename='/var/log/peon/dev/DEV-peonorc_actions_servers.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     client = docker.from_env()
     server_start(client,"csgo.server01")
