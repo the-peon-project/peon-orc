@@ -1,9 +1,10 @@
 import logging
-from xmlrpc.client import Server
+#from xmlrpc.client import Server
 from flask import Flask
 from flask_restful import Api
 # Import Peon Modules
 from api.api_v1 import ServerList, Server
+from actions.servers import *
 
 # Initialize Flask
 app = Flask(__name__)
