@@ -32,20 +32,20 @@ class Server(Resource):
 
     # PUT - Given an id
     def put(self, id):
-        print ("Do we even get here?")
         server = [server for server in servers if server['id'] == id]
         if len(server) == 0:
             abort(404)
         server = server[0]
         # Loop Through all the passed agruments
         args = self.reqparse.parse_args()
-        for k, v in args.items():
+        for key, value in args.items():
             # Check if the passed value is not null
-            if v is not None:
+            if value is not None:
                 # if not, set the element in the servers dict with the 'k' object to the value provided in the request.
-                server[k] = v
+                server[key] = value
+                print (server)
         return{"server": marshal(server, serverFields)}
-
+    # DELETE - Remove a server
     def delete(self, id):
         server = [server for server in servers if server['id'] == id]
         if(len(server) == 0):
@@ -61,10 +61,10 @@ class Servers(Resource):
             "servername", type=str, required=True, help="A custom server name must be provided.", location="json")
         self.reqparse.add_argument(
             "password", type=str, required=True, help="A custom server password must be provided.", location="json")
-
+    # GET - List all servers
     def get(self):
         return{"servers": [marshal(server, serverFields) for server in servers]}
-
+    # POST - Create a server
     def post(self):
         args = self.reqparse.parse_args()
         server = {
