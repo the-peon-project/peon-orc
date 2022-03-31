@@ -11,6 +11,9 @@ client = docker.from_env()
 # Local variables
 prefix = "peon.warcamp."
 
+def server_get_uid(server):
+    return "{0}.{1}".format(server['game_uid'],server['servername'])
+
 def servers_reload_current():
     servers.clear()
     containers = client.containers.list(all)
@@ -18,10 +21,9 @@ def servers_reload_current():
     for game_server in containers:
         if prefix in game_server.name:
             game_servers.append(game_server)
-    for indx,game_server in enumerate(game_servers):
+    for game_server in game_servers:
         server_full_uid = (game_server.name).split('.')
         server = {
-                'id' : indx + 1,
                 'game_uid' : server_full_uid[2],
                 'servername' : server_full_uid[3],
                 'password' : "**********",

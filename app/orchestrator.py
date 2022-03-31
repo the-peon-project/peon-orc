@@ -12,7 +12,7 @@ app = Flask(__name__)
 api_v1 = Api(app)
 
 api_v1.add_resource(Servers, "/api/1.0/servers")
-api_v1.add_resource(Server, "/api/1.0/server/<int:id>")
+api_v1.add_resource(Server, "/api/1.0/server/<string:server_uid>")
 
 # Start flask listener
 if __name__ == "__main__":

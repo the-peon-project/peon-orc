@@ -4,7 +4,6 @@ from .servers import *
 
 # Schema For the Server Request JSON
 serverFields = {
-    "id": fields.Integer,
     "game_uid": fields.String,
     "servername": fields.String,
     "password": fields.String,
@@ -21,15 +20,17 @@ class Server(Resource):
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
-    def get(self, id):
-        server = [server for server in servers if server['id'] == id]
+    def get(self, server_uid):
+        print(server_uid)
+        print(servers)
+        server = [server for server in servers if server_get_uid(server) == server_uid]
         if(len(server) == 0):
             abort(404)
         return{"server": marshal(server[0], serverFields)}
 
     # PUT - Given an id
-    def put(self, id):
-        server = [server for server in servers if server['id'] == id]
+    def put(self, server_uid):
+        server = [server for server in servers if server_get_uid(server) == server_uid]
         if len(server) == 0:
             abort(404)
         server = server[0]
@@ -49,8 +50,8 @@ class Server(Resource):
                     server_start("{0}.{1}".format(server['game_uid'],server['servername']))
         return{"server": marshal(server, serverFields)}
     # DELETE - Remove a server
-    def delete(self, id):
-        server = [server for server in servers if server['id'] == id]
+    def delete(self, server_uid):
+        server = [server for server in servers if server_get_uid(server) == server_uid]
         if(len(server) == 0):
             abort(404)
         server_uid = "{0}.{1}".format(server[0]["game_uid"],server[0]["servername"])
@@ -75,7 +76,6 @@ class Servers(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         server = {
-            "id": servers[-1]['id'] + 1 if len(servers) > 0 else 1,
             "game_uid": args["game_uid"],
             "servername": args["servername"],
             "password": args["password"]
