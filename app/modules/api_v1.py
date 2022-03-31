@@ -2,9 +2,6 @@
 from flask_restful import Resource, reqparse, abort, marshal, fields
 from .servers import *
 
-# A List of Dicts to store all of the servers
-servers = []
-
 # Schema For the Server Request JSON
 serverFields = {
     "id": fields.Integer,
@@ -13,7 +10,6 @@ serverFields = {
     "password": fields.String,
     "state": fields.String
 }
-
 class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request

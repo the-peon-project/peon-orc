@@ -2,13 +2,16 @@
 import logging
 import docker
 
+
+global servers
+servers = []
+
 prefix = "peon.warcamp."
 
 def servers_reload_current():
     client = docker.from_env()
     containers = client.containers.list(all)
     game_servers = []
-    servers = []
     for game_server in containers:
         if prefix in game_server.name:
             game_servers.append(game_server)
@@ -22,7 +25,6 @@ def servers_reload_current():
                 'state' : game_server.status
         }
         servers.append(server)
-    return servers
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
