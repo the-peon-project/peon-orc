@@ -53,7 +53,10 @@ class Server(Resource):
         server = [server for server in servers if server['id'] == id]
         if(len(server) == 0):
             abort(404)
-        servers.remove(server[0])
+        server_uid = "{0}.{1}".format(server[0]["game_uid"],server[0]["servername"])
+        server_stop(server_uid)
+        server_delete(server_uid)
+        servers_reload_current()
         return 201 
 class Servers(Resource):
     def __init__(self):
@@ -66,6 +69,7 @@ class Servers(Resource):
             "password", type=str, required=True, help="A custom server password must be provided.", location="json")
     # GET - List all servers
     def get(self):
+        servers_reload_current()
         return{"servers": [marshal(server, serverFields) for server in servers]}
     # POST - Create a server
     def post(self):
