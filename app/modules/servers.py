@@ -15,6 +15,7 @@ def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'],server['servername'])
 
 def servers_reload_current():
+    logging.debug("Checking exisitng servers")
     servers.clear()
     containers = client.containers.list(all)
     game_servers = []
@@ -42,9 +43,9 @@ def server_stop(server_uid):
     container.stop()
 
 def server_delete(server_uid):
+    logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix,server_uid))
     container.remove()
-    logging.info("Deleting server [{0}]".format(server_uid))
 
 # MAIN - for dev purposes
 if __name__ == "__main__":
