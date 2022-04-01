@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 import logging
-import docker
+from modules import client,servers,settings
 
 # Global variables
-global servers
-servers = []
-client = docker.from_env()
+
 
 
 # Local variables
@@ -51,4 +49,3 @@ def server_delete(server_uid):
 # MAIN - for dev purposes
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
-    server_delete("csgo.server02")
