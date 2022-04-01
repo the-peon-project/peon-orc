@@ -28,7 +28,8 @@ def servers_reload_current():
                 'game_uid' : server_full_uid[2],
                 'servername' : server_full_uid[3],
                 'password' : "**********",
-                'state' : game_server.status
+                'state' : game_server.status,
+                'description' : "- IMPLEMENT A DB -"
         }
         servers.append(server)
 
