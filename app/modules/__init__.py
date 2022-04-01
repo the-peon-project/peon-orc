@@ -1,7 +1,12 @@
 import json
 import docker
 
+# Server list
 global servers
 servers = []
+# Docker client file
 client = docker.from_env()
-settings = json.load(open("settings.json", 'r'))
+# Settings file
+settings = json.load(open("./app/settings.json", 'r'))
+# Container prefix
+prefix = "peon.warcamp."
