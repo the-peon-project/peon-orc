@@ -1,13 +1,6 @@
 #!/usr/bin/python3
 import logging
-from modules import client,servers,settings
-
-# Global variables
-
-
-
-# Local variables
-prefix = "peon.warcamp."
+from modules import client,servers,settings,prefix
 
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'],server['servername'])
