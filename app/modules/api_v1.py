@@ -7,7 +7,8 @@ serverFields = {
     "game_uid": fields.String,
     "servername": fields.String,
     "password": fields.String,
-    "state": fields.String
+    "state": fields.String,
+    "description" : fields.String
 }
 class Server(Resource):
     def __init__(self):
@@ -17,6 +18,7 @@ class Server(Resource):
         self.reqparse.add_argument("servername", type=str, location="json")
         self.reqparse.add_argument("password", type=str, location="json")
         self.reqparse.add_argument("state", type=str, location="json")
+        self.reqparse.add_argument("description", type=str, location="json")
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
@@ -41,13 +43,16 @@ class Server(Resource):
             if value is not None:
                 # if not, set the element in the servers dict with the 'key' object to the value provided in the request.
                 server[key] = value
-                if value == "start":
-                    server_start("{0}.{1}".format(server['game_uid'],server['servername']))
-                elif value == "stop":
-                    server_stop("{0}.{1}".format(server['game_uid'],server['servername']))
-                elif value == "restart":
-                    server_stop("{0}.{1}".format(server['game_uid'],server['servername']))
-                    server_start("{0}.{1}".format(server['game_uid'],server['servername']))
+                if key == "state":
+                    if value == "start": 
+                        server_start(server_get_uid(server))
+                    elif value == "stop":
+                        server_stop(server_get_uid(server))
+                    elif value == "restart":
+                        server_stop(server_get_uid(server))
+                        server_start(server_get_uid(server))
+                if key == "description":
+                    pass
         return{"server": marshal(server, serverFields)}
     # DELETE - Remove a server
     def delete(self, server_uid):
@@ -78,7 +83,8 @@ class Servers(Resource):
         server = {
             "game_uid": args["game_uid"],
             "servername": args["servername"],
-            "password": args["password"]
+            "password": args["password"],
+            "description" : args["description"]
         }
         servers.append(server)
         return{"server": marshal(server, serverFields)}, 201
