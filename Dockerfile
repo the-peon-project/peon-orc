@@ -14,4 +14,8 @@ COPY ./app /app
 # Set docker host IP
 ENV DOCKER_HOST ssh://172.20.0.1:22222
 # Start the app called api
-CMD ["python3", "/app/orchestrator.py"]
+COPY ./app /app
+# Move to working directory
+WORKDIR /app
+# Start application
+CMD ["python3", "main.py"]
