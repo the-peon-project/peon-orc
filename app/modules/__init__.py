@@ -7,6 +7,6 @@ servers = []
 # Docker client file
 client = docker.from_env()
 # Settings file
-settings = json.load(open("./app/settings.json", 'r'))
+settings = json.load(open("settings.json", 'r'))
 # Container prefix
 prefix = "peon.warcamp."
