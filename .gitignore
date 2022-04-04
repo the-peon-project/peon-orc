@@ -1,3 +1,5 @@
+dev-*
+
 db/
 server.state
 servers/
