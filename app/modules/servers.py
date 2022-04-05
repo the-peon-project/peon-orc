@@ -67,8 +67,6 @@ def server_deploy(server_uid,user_settings):
         tty=True
     )
 
-
-
 # MAIN - for dev purposes
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
