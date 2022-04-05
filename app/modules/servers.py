@@ -2,6 +2,7 @@
 import logging
 import json
 from modules import client,servers,settings,prefix
+from shell import execute_shell
 
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'],server['servername'])
@@ -41,28 +42,44 @@ def server_delete(server_uid):
     container.remove()
 
 def server_deploy(server_uid,user_settings):
-
     # START
-    # STEP 1: Clone plans into server path
+    container_name = "{0}{1}".format(prefix,server_uid)
+    logging.info("Server deplyment requested [{0}]".format(container_name))
+    # STEP 1: Initialise game path
+    execute_shell("mkdir -p {0}/data && chown -R 1000:1000 .".format(server_uid.split('.')[1]))
+    execute_shell("mkdir -p /var/log/peon/{0}/{1} && chown -R 1000:1000 /var/log/peon/.".format(server_uid.split('.')[0],server_uid.split('.')[1]))
     temp_working_dir = "/root/peon/servers/csgo"
-    # STEP 2: Import plan config
-    server_config = json.load(open("{0}/config.json".format(temp_working_dir), 'r'))
-    logging.info("Server deplyment requested:")
-    logging.info(json.dumps(server_config["metadata"], indent=4, sort_keys=True))
-    # STEP 3: Collect options
-    
-    # STEP 4: Update config with settings
-    # STEP 5: Deploy container based on prefered settings
-    container_config=server_config["container_config"]
-    logging.debug("Contatiner Configuration")
+    # STEP 2: Import plan config data
+    config = json.load(open("{0}/config.json".format(temp_working_dir), 'r'))
+    logging.debug(json.dumps(config["metadata"], indent=4, sort_keys=True))
+    # STEP 3: Deploy container with game server requirements
+    container_config=config["container_config"]
+    server_config=config["server_config"]
+    logging.debug("Container Configuration")
     logging.debug(json.dumps(container_config, indent=4, sort_keys=True))
     container = client.containers.run(
         container_config["image"],
-        name="{0}{1}".format(prefix,server_uid),
+        name=container_name,
         working_dir=container_config["working_directory"],
         user=container_config["user"],
         volumes=container_config["volumes"],
         ports=container_config["ports"],
+        environment=container_config["variables"],
+        detach=True,
+        tty=True
+    )
+    # STEP 4: Copy necessary plan deployment files into container
+    logging.debug("Copy deplyment files into container.")
+    for file in config["server_config"]["files"]:
+        logging.debug(" {0}".format(file))
+        execute_shell("docker cp {0} {1}:{2}/".format(file,container_name,container_config["working_directory"]))
+    # STEP 5: Run server scripts to deploy container
+    logging.debug("Exectuing commands in container")
+    logging.debug(" {0}".format(server_config["commands"]))
+    container.exec_run(
+        server_config["commands"],
+        workdir=container_config["working_directory"],
+        user=container_config["user"],
         detach=True,
         tty=True
     )
