@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import logging
+import json
 from modules import client,servers,settings,prefix
 
 def server_get_uid(server):
@@ -38,6 +39,35 @@ def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix,server_uid))
     container.remove()
+
+def server_deploy(server_uid,user_settings):
+
+    # START
+    # STEP 1: Clone plans into server path
+    temp_working_dir = "/root/peon/servers/csgo"
+    # STEP 2: Import plan config
+    server_config = json.load(open("{0}/config.json".format(temp_working_dir), 'r'))
+    logging.info("Server deplyment requested:")
+    logging.info(json.dumps(server_config["metadata"], indent=4, sort_keys=True))
+    # STEP 3: Collect options
+    
+    # STEP 4: Update config with settings
+    # STEP 5: Deploy container based on prefered settings
+    container_config=server_config["container_config"]
+    logging.debug("Contatiner Configuration")
+    logging.debug(json.dumps(container_config, indent=4, sort_keys=True))
+    container = client.containers.run(
+        container_config["image"],
+        name="{0}{1}".format(prefix,server_uid),
+        working_dir=container_config["working_directory"],
+        user=container_config["user"],
+        volumes=container_config["volumes"],
+        ports=container_config["ports"],
+        detach=True,
+        tty=True
+    )
+
+
 
 # MAIN - for dev purposes
 if __name__ == "__main__":
