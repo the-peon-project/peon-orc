@@ -43,20 +43,27 @@ def server_delete(server_uid):
 
 def server_deploy(server_uid,user_settings):
     # START
+    root_path = "/root/peon/servers"
+    game_uid=server_uid.split('.')[0]
+    server_name=server_uid.split('.')[1]
+    server_path = "{0}/{1}/{2}".format(root_path,game_uid,server_name)
     container_name = "{0}{1}".format(prefix,server_uid)
     logging.info("Server deplyment requested [{0}]".format(container_name))
     # STEP 1: Initialise game path
-    execute_shell("mkdir -p {0}/data && chown -R 1000:1000 .".format(server_uid.split('.')[1]))
-    execute_shell("mkdir -p /var/log/peon/{0}/{1} && chown -R 1000:1000 /var/log/peon/.".format(server_uid.split('.')[0],server_uid.split('.')[1]))
-    temp_working_dir = "/root/peon/servers/csgo"
+    execute_shell("mkdir -p {0}/data && chown -R 1000:1000 {0}".format(server_path))
+    execute_shell("mkdir -p /var/log/peon/{0} && chown -R 1000:1000 /var/log/peon/.".format(server_uid))
     # STEP 2: Import plan config data
-    config = json.load(open("{0}/config.json".format(temp_working_dir), 'r'))
+    config = json.load(open("{0}/{1}/config.json".format(root_path,game_uid), 'r'))
     logging.debug(json.dumps(config["metadata"], indent=4, sort_keys=True))
     # STEP 3: Deploy container with game server requirements
     container_config=config["container_config"]
     server_config=config["server_config"]
     logging.debug("Container Configuration")
     logging.debug(json.dumps(container_config, indent=4, sort_keys=True))
+    container_config["volumes"]["{0}/data".format(server_path)] = container_config["volumes"]["data_path"].copy()
+    del container_config["volumes"]["data_path"]
+    container_config["volumes"]["/var/log/peon/{0}".format(server_uid)] = container_config["volumes"]["log_path"].copy()
+    del container_config["volumes"]["log_path"]
     container = client.containers.run(
         container_config["image"],
         name=container_name,
@@ -72,7 +79,7 @@ def server_deploy(server_uid,user_settings):
     logging.debug("Copy deplyment files into container.")
     for file in config["server_config"]["files"]:
         logging.debug(" {0}".format(file))
-        execute_shell("docker cp {0} {1}:{2}/".format(file,container_name,container_config["working_directory"]))
+        execute_shell("docker cp {0}/{1}/{2} {3}:{4}/".format(root_path,game_uid,file,container_name,container_config["working_directory"]))
     # STEP 5: Run server scripts to deploy container
     logging.debug("Exectuing commands in container")
     logging.debug(" {0}".format(server_config["commands"]))
