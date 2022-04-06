@@ -96,7 +96,8 @@ def server_deploy(server_uid, user_settings={}):
     logging.debug(" {0}".format(server_config["commands"]))
     for shell_command in server_config["commands"]:
         container.exec_run(
-            shell_command, user=container_config["user"], detach=True, tty=True)
+            shell_command, user=container_config["user"], environment=container_config["variables"], detach=True, tty=True)
+
 
 # MAIN - for dev purposes
 if __name__ == "__main__":
