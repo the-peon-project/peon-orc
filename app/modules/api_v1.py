@@ -2,6 +2,8 @@
 from flask_restful import Resource, reqparse, abort, marshal, fields
 from modules import servers, settings
 from .servers import *
+import logging
+import traceback
 
 # Schema For the Server Request JSON
 serverFields = {
@@ -26,8 +28,7 @@ class Server(Resource):
 
     # GET - Returns a single server object given a matching id
     def get(self, server_uid):
-        print(server_uid)
-        print(servers)
+        logging.debug("APIv1 - Server Get")
         server = [server for server in servers if server_get_uid(
             server) == server_uid]
         if(len(server) == 0):
@@ -36,6 +37,7 @@ class Server(Resource):
 
     # PUT - Given an id
     def put(self, server_uid):
+        logging.debug("APIv1 - Server Put")
         server = [server for server in servers if server_get_uid(
             server) == server_uid]
         if len(server) == 0:
@@ -62,6 +64,7 @@ class Server(Resource):
     # DELETE - Remove a server
 
     def delete(self, server_uid):
+        logging.debug("APIv1 - Server Delete")
         server = [server for server in servers if server_get_uid(
             server) == server_uid]
         if(len(server) == 0):
@@ -88,11 +91,13 @@ class Servers(Resource):
     # GET - List all servers
 
     def get(self):
+        logging.debug("APIv1 - Servers Get/List")
         servers_reload_current()
         return{"servers": [marshal(server, serverFields) for server in servers]}
     # POST - Create a server
 
     def post(self):
+        logging.debug("APIv1 - Server Post/Create")
         args = self.reqparse.parse_args()
         server = {
             "game_uid": args["game_uid"],
@@ -101,9 +106,9 @@ class Servers(Resource):
             "description": args["description"]
         }
         try:
-            server_create("{1}.{0}".format(
-                args["game_uid"], arg["servername"]))
+            server_create("{0}.{1}".format(
+                args["game_uid"], args["servername"]))
             servers.append(server)
             return{"server": marshal(server, serverFields)}, 201
-        except:
-            pass
+        except Exception as e:
+            logging.error(traceback.format_exc())
