@@ -2,7 +2,7 @@
 import logging
 import json
 from modules import client, servers, settings, prefix
-from shell import execute_shell
+from .shell import execute_shell
 
 
 def server_get_uid(server):
@@ -52,29 +52,36 @@ def server_create(server_uid, user_settings={}):
     root_path = "/root/peon"
     server_root_path = "{0}/servers".format(root_path)
     plan_root_path = "{0}/plans".format(root_path)
-    game_uid=server_uid.split('.')[0]
-    server_name=server_uid.split('.')[1]
-    server_path = "{0}/{1}/{2}".format(server_root_path,game_uid,server_name)
-    container_name = "{0}{1}".format(prefix,server_uid)
+    game_uid = server_uid.split('.')[0]
+    server_name = server_uid.split('.')[1]
+    server_path = "{0}/{1}/{2}".format(server_root_path, game_uid, server_name)
+    container_name = "{0}{1}".format(prefix, server_uid)
     logging.info("Server deplyment requested [{0}]".format(container_name))
     # STEP 1: Initialise game path
-    execute_shell("mkdir -p {0}/data && chown -R 1000:1000 {0}".format(server_path))
-    execute_shell("mkdir -p /var/log/peon/{0} && chown -R 1000:1000 /var/log/peon/.".format(server_uid))
+    execute_shell(
+        "mkdir -p {0}/data && chown -R 1000:1000 {0}".format(server_path))
+    execute_shell(
+        "mkdir -p /var/log/peon/{0} && chown -R 1000:1000 /var/log/peon/.".format(server_uid))
     # STEP 2: Import plan config data
-    config = json.load(open("{0}/games/{1}/config.json".format(plan_root_path,game_uid), 'r'))
+    config = json.load(
+        open("{0}/games/{1}/config.json".format(plan_root_path, game_uid), 'r'))
     logging.debug(json.dumps(config["metadata"], indent=4, sort_keys=True))
     # STEP 3: Deploy container with game server requirements
-    container_config=config["container_config"]
-    server_config=config["server_config"]
+    container_config = config["container_config"]
+    server_config = config["server_config"]
     logging.debug("Container Configuration")
     logging.debug(json.dumps(container_config, indent=4, sort_keys=True))
-    container_config["volumes"]["{0}/shared".format(plan_root_path)] = container_config["volumes"]["shared_plan_path"].copy()
+    container_config["volumes"]["{0}/shared".format(
+        plan_root_path)] = container_config["volumes"]["shared_plan_path"].copy()
     del container_config["volumes"]["shared_plan_path"]
-    container_config["volumes"]["{0}/games/{1}".format(plan_root_path,game_uid)] = container_config["volumes"]["unique_plan_path"].copy()
+    container_config["volumes"]["{0}/games/{1}".format(
+        plan_root_path, game_uid)] = container_config["volumes"]["unique_plan_path"].copy()
     del container_config["volumes"]["unique_plan_path"]
-    container_config["volumes"]["{0}/data".format(server_path)] = container_config["volumes"]["data_path"].copy()
+    container_config["volumes"]["{0}/data".format(
+        server_path)] = container_config["volumes"]["data_path"].copy()
     del container_config["volumes"]["data_path"]
-    container_config["volumes"]["/var/log/peon/{0}".format(server_uid)] = container_config["volumes"]["log_path"].copy()
+    container_config["volumes"]["/var/log/peon/{0}".format(
+        server_uid)] = container_config["volumes"]["log_path"].copy()
     del container_config["volumes"]["log_path"]
     container = client.containers.run(
         container_config["image"],
@@ -92,7 +99,9 @@ def server_create(server_uid, user_settings={}):
     logging.debug("Exectuing commands in container")
     logging.debug(" {0}".format(server_config["commands"]))
     for shell_command in server_config["commands"]:
-        container.exec_run(shell_command,user=container_config["user"],environment=container_config["variables"],detach=True,tty=True)
+        container.exec_run(
+            shell_command, user=container_config["user"], environment=container_config["variables"], detach=True, tty=True)
+
 
 # MAIN - for dev purposes
 if __name__ == "__main__":
