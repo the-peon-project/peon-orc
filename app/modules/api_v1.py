@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from flask_restful import Resource, reqparse, abort, marshal, fields
-from modules import servers,settings
+from modules import servers, settings
 from .servers import *
 
 # Schema For the Server Request JSON
@@ -9,8 +9,10 @@ serverFields = {
     "servername": fields.String,
     "password": fields.String,
     "state": fields.String,
-    "description" : fields.String
+    "description": fields.String
 }
+
+
 class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
@@ -26,14 +28,16 @@ class Server(Resource):
     def get(self, server_uid):
         print(server_uid)
         print(servers)
-        server = [server for server in servers if server_get_uid(server) == server_uid]
+        server = [server for server in servers if server_get_uid(
+            server) == server_uid]
         if(len(server) == 0):
             abort(404)
         return{"server": marshal(server[0], serverFields)}
 
     # PUT - Given an id
     def put(self, server_uid):
-        server = [server for server in servers if server_get_uid(server) == server_uid]
+        server = [server for server in servers if server_get_uid(
+            server) == server_uid]
         if len(server) == 0:
             abort(404)
         server = server[0]
@@ -45,7 +49,7 @@ class Server(Resource):
                 # if not, set the element in the servers dict with the 'key' object to the value provided in the request.
                 server[key] = value
                 if key == "state":
-                    if value == "start": 
+                    if value == "start":
                         server_start(server_get_uid(server))
                     elif value == "stop":
                         server_stop(server_get_uid(server))
@@ -56,15 +60,20 @@ class Server(Resource):
                     pass
         return{"server": marshal(server, serverFields)}
     # DELETE - Remove a server
+
     def delete(self, server_uid):
-        server = [server for server in servers if server_get_uid(server) == server_uid]
+        server = [server for server in servers if server_get_uid(
+            server) == server_uid]
         if(len(server) == 0):
             abort(404)
-        server_uid = "{0}.{1}".format(server[0]["game_uid"],server[0]["servername"])
+        server_uid = "{0}.{1}".format(
+            server[0]["game_uid"], server[0]["servername"])
         server_stop(server_uid)
         server_delete(server_uid)
         servers_reload_current()
-        return 201 
+        return 201
+
+
 class Servers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -74,18 +83,27 @@ class Servers(Resource):
             "servername", type=str, required=True, help="A custom server name must be provided.", location="json")
         self.reqparse.add_argument(
             "password", type=str, required=True, help="A custom server password must be provided.", location="json")
+        self.reqparse.add_argument(
+            "description", type=str, required=False, help="A server description can be provided", location="json")
     # GET - List all servers
+
     def get(self):
         servers_reload_current()
         return{"servers": [marshal(server, serverFields) for server in servers]}
     # POST - Create a server
+
     def post(self):
         args = self.reqparse.parse_args()
         server = {
             "game_uid": args["game_uid"],
             "servername": args["servername"],
             "password": args["password"],
-            "description" : args["description"]
+            "description": args["description"]
         }
-        servers.append(server)
-        return{"server": marshal(server, serverFields)}, 201
+        try:
+            server_create("{1}.{0}".format(
+                args["game_uid"], arg["servername"]))
+            servers.append(server)
+            return{"server": marshal(server, serverFields)}, 201
+        except:
+            pass
