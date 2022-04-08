@@ -34,17 +34,19 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 ### Feature Plan
 
-#### *sprint 1.0.0*
+#### *sprint 0.1.0*
 
-- [ ] RESTapi
-- [ ] Server deployment
+- [x] RESTapi (v1)
+- [x] Server deployment (v1)
 
-#### *sprint 2.0.0*
+#### *sprint 0.2.0*
+
+- [ ] RESTapi (v2) - custom configurations
+- [ ] Server deployment (v2) - custom configurations
+
+#### *sprint 0.3.0*
 
 - [ ] Persistent server data - Keep server data for updates & future releases.
-
-#### *sprint 3.0.0*
-
 - [ ] Backups
 
 #### Notes
