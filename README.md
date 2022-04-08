@@ -16,11 +16,11 @@ The [github](https://github.com/nox-noctua-consulting/peon-orc/) repo for develo
 
 > **EARLY DEVELOPMENT**
 
-Completely useless at this point
+Basic start/stop/restart/deploy/delete server functionality working
 
 ## Version Info
 
-### 0.1.4-dev
+### 0.1.5-dev
 
 - Deployed with ``python:3.9-slim-bullseye`` as base image
 - Using ``flask-restful`` as a framework to handle the API.
