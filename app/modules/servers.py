@@ -59,7 +59,7 @@ def server_create(server_uid, user_settings={}):
     logging.info("Server deplyment requested [{0}]".format(container_name))
     # STEP 1: Initialise game paths
     execute_shell(
-        "mkdir -p {0}/data {0}/save {0}/logs && chown -R 1000:1000 {0}".format(server_path))
+        "mkdir -p {0}/data {0}/config {0}/logs && chown -R 1000:1000 {0}".format(server_path))
     # STEP 2: Import plan config data
     config = json.load(
         open("{0}/games/{1}/config.json".format(plan_root_path, game_uid), 'r'))
@@ -79,10 +79,10 @@ def server_create(server_uid, user_settings={}):
     container_config["volumes"]["{0}/data".format(
         server_path)] = container_config["volumes"]["data_path"].copy()
     del container_config["volumes"]["data_path"]
-    if "save" in container_config["volumes"]:
-        container_config["volumes"]["{0}/save".format(
-            server_path)] = container_config["volumes"]["save"].copy()
-        del container_config["volumes"]["save"]
+    if "config" in container_config["volumes"]:
+        container_config["volumes"]["{0}/config".format(
+            server_path)] = container_config["volumes"]["config"].copy()
+        del container_config["volumes"]["config"]
     container_config["volumes"]["{0}/logs".format(
         server_path)] = container_config["volumes"]["log_path"].copy()
     del container_config["volumes"]["log_path"]
