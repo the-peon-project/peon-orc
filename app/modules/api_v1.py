@@ -114,8 +114,7 @@ class Servers(Resource):
                 args["game_uid"], 
                 args["servername"]))
             servers.append(server)
-            print ("SHOULDN'T GET HERE")
             return{"server": marshal(server, serverFields)}, 201
         except Exception as e:
             logging.error(traceback.format_exc())
-            return {"error": "An excetion was thrown. Please check the orc.log on the poen-orc server."}, 500
+            return {"error": "Zer is a boog in ze code. Check the 'orc.log' for the traceback."}, 500
