@@ -74,7 +74,7 @@ class Server(Resource):
         server_stop(server_uid)
         server_delete(server_uid)
         servers_reload_current()
-        return 201
+        return {"success" : "Server {0} was deleted.".format(server_uid)}, 200
 
 
 class Servers(Resource):
@@ -106,9 +106,16 @@ class Servers(Resource):
             "description": args["description"]
         }
         try:
+            servers_reload_current()
+            for server in servers:
+                if args["game_uid"] == server["game_uid"] and args["servername"] == server["servername"]:
+                    return{"error": "Server already exists."}, 501
             server_create("{0}.{1}".format(
-                args["game_uid"], args["servername"]))
+                args["game_uid"], 
+                args["servername"]))
             servers.append(server)
+            print ("SHOULDN'T GET HERE")
             return{"server": marshal(server, serverFields)}, 201
         except Exception as e:
             logging.error(traceback.format_exc())
+            return {"error": "An excetion was thrown. Please check the orc.log on the poen-orc server."}, 500
