@@ -20,13 +20,15 @@ Basic start/stop/restart/deploy/delete server functionality working
 
 ## Version Info
 
-### 0.1.5-dev
+Check [changelog](https://github.com/nox-noctua-consulting/peon-orc/blob/master/changelog.md) for more information
 
 - Deployed with ``python:3.9-slim-bullseye`` as base image
 - Using ``flask-restful`` as a framework to handle the API.
 - Using ``docker-py`` for container management
 
-#### Known Bugs
+### Known Bugs
+
+-
 
 ### Architecture/Rules
 
