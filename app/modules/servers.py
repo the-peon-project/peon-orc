@@ -57,11 +57,9 @@ def server_create(server_uid, user_settings={}):
     server_path = "{0}/{1}/{2}".format(server_root_path, game_uid, server_name)
     container_name = "{0}{1}".format(prefix, server_uid)
     logging.info("Server deplyment requested [{0}]".format(container_name))
-    # STEP 1: Initialise game path
+    # STEP 1: Initialise game paths
     execute_shell(
-        "mkdir -p {0}/data && chown -R 1000:1000 {0}".format(server_path))
-    execute_shell(
-        "mkdir -p /var/log/peon/{0} && chown -R 1000:1000 /var/log/peon/.".format(server_uid))
+        "mkdir -p {0}/data {0}/save {0}/logs && chown -R 1000:1000 {0}".format(server_path))
     # STEP 2: Import plan config data
     config = json.load(
         open("{0}/games/{1}/config.json".format(plan_root_path, game_uid), 'r'))
@@ -71,6 +69,7 @@ def server_create(server_uid, user_settings={}):
     server_config = config["server_config"]
     logging.debug("Container Configuration")
     logging.debug(json.dumps(container_config, indent=4, sort_keys=True))
+    # Set shared volume path with unique name in key from config, then delete old temp key
     container_config["volumes"]["{0}/shared".format(
         plan_root_path)] = container_config["volumes"]["shared_plan_path"].copy()
     del container_config["volumes"]["shared_plan_path"]
@@ -80,8 +79,12 @@ def server_create(server_uid, user_settings={}):
     container_config["volumes"]["{0}/data".format(
         server_path)] = container_config["volumes"]["data_path"].copy()
     del container_config["volumes"]["data_path"]
-    container_config["volumes"]["/var/log/peon/{0}".format(
-        server_uid)] = container_config["volumes"]["log_path"].copy()
+    if "save" in container_config["volumes"]:
+        container_config["volumes"]["{0}/save".format(
+            server_path)] = container_config["volumes"]["save"].copy()
+        del container_config["volumes"]["save"]
+    container_config["volumes"]["{0}/logs".format(
+        server_path)] = container_config["volumes"]["log_path"].copy()
     del container_config["volumes"]["log_path"]
     container = client.containers.run(
         container_config["image"],
