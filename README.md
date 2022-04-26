@@ -52,3 +52,5 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 - [ ] Backups
 
 #### Notes
+
+[HTML Response Codes](https://www.restapitutorial.com/httpstatuscodes.html)
