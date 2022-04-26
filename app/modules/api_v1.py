@@ -107,8 +107,8 @@ class Servers(Resource):
         }
         try:
             servers_reload_current()
-            for server in servers:
-                if args["game_uid"] == server["game_uid"] and args["servername"] == server["servername"]:
+            for serv in servers:
+                if args["game_uid"] == serv["game_uid"] and args["servername"] == serv["servername"]:
                     return{"error": "Server already exists."}, 501
             server_create("{0}.{1}".format(
                 args["game_uid"], 
