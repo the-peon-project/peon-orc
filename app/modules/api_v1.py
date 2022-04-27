@@ -56,10 +56,10 @@ class Server(Resource):
                         server_stop(server_get_uid(server))
                         server_start(server_get_uid(server))
                 if key == "description":
-                    pass
+                    server_update_description(server,server[key])
         return{"server": marshal(server, serverFields)}
+    
     # DELETE - Remove a server
-
     def delete(self, server_uid):
         logging.debug("APIv1 - Server Delete")
         server = [server for server in servers if server_get_uid(
