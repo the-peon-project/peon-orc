@@ -13,7 +13,6 @@ serverFields = {
     "description": fields.String
 }
 
-
 class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
@@ -112,6 +111,7 @@ class Servers(Resource):
                 args["settings"] = []
             error = server_create("{0}.{1}".format(
                 args["game_uid"],args["servername"]), 
+                args["description"],
                 args["settings"])
             if error == "none":
                 servers.append(server)
