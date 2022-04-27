@@ -35,8 +35,8 @@ def servers_reload_current():
         servers.append(server)
 
 def server_update_description(server,description):
-    logging.debug("Updating {0}.{1}'s description to [{2}]".format(server['game_uid'],server['game_uid'],description))
-    with open("{0}/description".format("{0}/servers/{1}/{2}/description".format(root_path,server['game_uid'],server['game_uid'])), 'w') as f: f.write(description)
+    logging.debug("Updating {0}.{1}'s description to [{2}]".format(server['game_uid'],server['servername'],description))
+    with open("{0}/servers/{1}/{2}/description".format(root_path,server['game_uid'],server['servername']), 'w') as f: f.write(description)
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
