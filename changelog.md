@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.1-dev
+
+- Bugfix - Enforced description & settings on [post]servers
+  
 ## 0.2.0-dev
 
 - Added custom config handler
