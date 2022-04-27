@@ -12,6 +12,8 @@ def server_get_uid(server):
 
 def servers_reload_current():
     logging.debug("Checking exisitng servers")
+    root_path = "/root/peon"
+    server_root_path = "{0}/servers".format(root_path)
     servers.clear()
     containers = client.containers.list(all)
     game_servers = []
@@ -20,11 +22,16 @@ def servers_reload_current():
             game_servers.append(game_server)
     for game_server in game_servers:
         server_full_uid = (game_server.name).split('.')
+        try: 
+            with open('{0}/{1}/{2}/description'.format(server_root_path,server_full_uid[2],server_full_uid[3]), 'r') as f:
+                description = f.read()
+        except:
+            description = ""
         server = {
             'game_uid': server_full_uid[2],
             'servername': server_full_uid[3],
             'state': game_server.status,
-            'description': "- IMPLEMENT A DB -"
+            'description': description
         }
         servers.append(server)
 
@@ -57,7 +64,7 @@ def file_json(path,content):
 def file_txt(path,content):
     with open(path, 'w') as f: f.write(content)
 
-def server_create(server_uid, settings=[]):
+def server_create(server_uid, description, settings=[]):
     # START
     error = "none"
     root_path = "/root/peon"
@@ -70,6 +77,7 @@ def server_create(server_uid, settings=[]):
     logging.info("Server deplyment requested [{0}]".format(container_name))
     # STEP 1: Initialise game paths
     execute_shell("mkdir -p {0}/data {0}/config {0}/logs".format(server_path))
+    with open("{0}/description".format(server_path), 'w') as f: f.write(description)
     # STEP 2: Import plan config data
     config = json.load(
         open("{0}/games/{1}/config.json".format(plan_root_path, game_uid), 'r'))
