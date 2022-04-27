@@ -82,9 +82,9 @@ class Servers(Resource):
         self.reqparse.add_argument(
             "servername", type=str, required=True, help="A custom server name must be provided.", location="json")
         self.reqparse.add_argument(
-            "description", type=str, required=False, help="A server description can be provided", location="json")
+            "description", type=str, required=True, help="A server description can be provided", location="json")
         self.reqparse.add_argument(
-            "settings", type=list, required=False, help="Settings data provided for the server", location="json")
+            "settings", type=list, required=True, help="Settings data provided for the server. Can be an empty list.", location="json")
     # GET - List all servers
 
     def get(self):
