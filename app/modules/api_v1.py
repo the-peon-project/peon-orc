@@ -115,11 +115,14 @@ class Servers(Resource):
                     return{"error": "Server already exists."}, 501
             if "settings" not in args.keys():
                 args["settings"] = []
-            server_create("{0}.{1}".format(
+            error = server_create("{0}.{1}".format(
                 args["game_uid"],args["servername"]), 
                 args["settings"])
-            servers.append(server)
-            return{"server": marshal(server, serverFields)}, 201
+            if error == "none":
+                servers.append(server)
+                return{"server": marshal(server, serverFields)}, 201
+            else:
+                return{"error" : error}, 501
         except Exception as e:
             logging.error(traceback.format_exc())
             return {"error": "Zer is a boog in ze code. Check the 'orc.log' for the traceback."}, 500
