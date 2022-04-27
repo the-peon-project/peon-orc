@@ -74,7 +74,7 @@ class Server(Resource):
         server_stop(server_uid)
         server_delete(server_uid)
         servers_reload_current()
-        return {"success" : "Server {0} was deleted.".format(server_uid)}, 200
+        return {"success": "Server {0} was deleted.".format(server_uid)}, 200
 
 
 class Servers(Resource):
@@ -88,6 +88,8 @@ class Servers(Resource):
             "password", type=str, required=True, help="A custom server password must be provided.", location="json")
         self.reqparse.add_argument(
             "description", type=str, required=False, help="A server description can be provided", location="json")
+        self.reqparse.add_argument(
+            "settings", type=list, required=False, help="Settings data provided for the server", location="json")
     # GET - List all servers
 
     def get(self):
@@ -103,16 +105,19 @@ class Servers(Resource):
             "game_uid": args["game_uid"],
             "servername": args["servername"],
             "password": args["password"],
-            "description": args["description"]
+            "description": args["description"],
+            "settings" : args["settings"]
         }
         try:
             servers_reload_current()
             for serv in servers:
                 if args["game_uid"] == serv["game_uid"] and args["servername"] == serv["servername"]:
                     return{"error": "Server already exists."}, 501
+            if "settings" not in args.keys():
+                args["settings"] = []
             server_create("{0}.{1}".format(
-                args["game_uid"], 
-                args["servername"]))
+                args["game_uid"],args["servername"]), 
+                args["settings"])
             servers.append(server)
             return{"server": marshal(server, serverFields)}, 201
         except Exception as e:
