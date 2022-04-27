@@ -1,5 +1,7 @@
 # PEON - Orchestrator
 
+![André Kent - Artstation](https://cdna.artstation.com/p/assets/images/images/023/913/316/large/andre-kent-peon-turntable.jpg)
+
 ## The Easy Game Server Manager
 
 ### [Peon Project](https://github.com/nox-noctua-consulting/peon)
@@ -43,8 +45,8 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 #### *sprint 0.2.0*
 
-- [ ] RESTapi (v2) - custom configurations
-- [ ] Server deployment (v2) - custom configurations
+- [x] RESTapi (v2) - custom configurations
+- [x] Server deployment (v2) - custom configurations
 
 #### *sprint 0.3.0*
 
@@ -54,3 +56,53 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 #### Notes
 
 [HTML Response Codes](https://www.restapitutorial.com/httpstatuscodes.html)
+
+#### API
+
+RESTful API
+
+##### URL
+
+{{peon_orchestrator_url}}:{{api_port}}/api/1.0/servers
+
+##### Servers
+
+Actions for multiple servers/server creation
+
+##### Server
+
+#### API Examples
+
+##### Create server
+
+Payload
+
+```json
+{
+    "game_uid": "valhiem",
+    "servername": "server01",
+    "description": "A valhiem PEON server",
+    "settings": [{
+            "type": "env",
+            "name": "container environment",
+            "content": {
+                "SERVERNAME": "My-Valhiem-Server",
+                "WORLDNAME": "awesomeworld",
+                "PASSWORD": "password123"
+            }
+        },
+        {
+            "type": "json",
+            "name": "config.json",
+            "content": {
+                "somekey": "somevalue"
+            }
+        },
+        {
+            "type": "txt",
+            "name": "textfile.txt",
+            "content": "Some random text. With a \ttabspace & and a \nnewline."
+        }
+    ]
+}
+```
