@@ -9,7 +9,8 @@ root_path = "/root/peon"
 server_root_path = "{0}/servers".format(root_path)
 
 def server_get_uid(server):
-    return "{0}.{1}".format(server['game_uid'], server['game_uid'])
+    return "{0}.{1}".format(server['game_uid'], server['servername'])
+
 def servers_reload_current():
     logging.debug("Checking exisitng servers")
     servers.clear()
