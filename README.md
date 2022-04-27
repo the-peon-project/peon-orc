@@ -6,9 +6,9 @@
 
 ### [Peon Project](https://github.com/nox-noctua-consulting/peon)
 
-An **OpenSource** project to assist gamers in self deploying/managing game servers.\
+An **OpenSource** project to assist gamers in self-deploying/managing game servers.\
 Intended to be a one-stop-shop for game server deployment/management.\
-If run on a public/paid cloud, it is architected to try minimise costs (easy schedule/manage uptime vs downtime)
+If run on a public/paid cloud, it is architected to try to minimise costs (easy schedule/manage uptime vs downtime)
 
 ### Peon Orchestrator (peon.orc)
 
@@ -24,7 +24,7 @@ Basic start/stop/restart/deploy/delete server functionality working
 
 Check [changelog](https://github.com/nox-noctua-consulting/peon-orc/blob/master/changelog.md) for more information
 
-- Deployed with ``python:3.9-slim-bullseye`` as base image
+- Deployed with ``python:3.9-slim-bullseye`` as a base image
 - Using ``flask-restful`` as a framework to handle the API.
 - Using ``docker-py`` for container management
 
@@ -61,7 +61,7 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 RESTful API
 
-This API expects a json payload in most cases.
+This API expects a JSON payload in most cases.
 
 ```yaml
 url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
