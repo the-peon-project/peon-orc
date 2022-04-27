@@ -67,11 +67,11 @@ This API expects a JSON payload in most cases.
 url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
     servers:
         - [GET] List all servers registered to Orchestrator
-        - [POST] Create a new server on orchestrator
+        - [POST] Create a new game server on orchestrator
     server:
-        - [GET] Get a specific server from the Orchestrator
-        - [DEL] Delete a server from the Orchestrator
-        - [PUT] Start/Stop/Restart a server on the Orchestrator
+        - [GET] Get a specific game server from the Orchestrator
+        - [DEL] Delete a game server from the Orchestrator
+        - [PUT] Update description or Start/Stop/Restart a game server on the Orchestrator
 
 ```
 
