@@ -9,7 +9,6 @@ import traceback
 serverFields = {
     "game_uid": fields.String,
     "servername": fields.String,
-    "password": fields.String,
     "state": fields.String,
     "description": fields.String
 }
@@ -21,7 +20,6 @@ class Server(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("game_uid", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
-        self.reqparse.add_argument("password", type=str, location="json")
         self.reqparse.add_argument("state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
         super(Server, self).__init__()
@@ -85,8 +83,6 @@ class Servers(Resource):
         self.reqparse.add_argument(
             "servername", type=str, required=True, help="A custom server name must be provided.", location="json")
         self.reqparse.add_argument(
-            "password", type=str, required=True, help="A custom server password must be provided.", location="json")
-        self.reqparse.add_argument(
             "description", type=str, required=False, help="A server description can be provided", location="json")
         self.reqparse.add_argument(
             "settings", type=list, required=False, help="Settings data provided for the server", location="json")
@@ -104,7 +100,6 @@ class Servers(Resource):
         server = {
             "game_uid": args["game_uid"],
             "servername": args["servername"],
-            "password": args["password"],
             "description": args["description"],
             "settings" : args["settings"]
         }
