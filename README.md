@@ -61,21 +61,27 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 RESTful API
 
-##### URL
+This API expects a json payload in most cases.
 
-{{peon_orchestrator_url}}:{{api_port}}/api/1.0/servers
+```yaml
+url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
+    servers:
+        - [GET] List all servers registered to Orchestrator
+        - [POST] Create a new server on orchestrator
+    server:
+        - [GET] Get a specific server from the Orchestrator
+        - [DEL] Delete a server from the Orchestrator
+        - [PUT] Start/Stop/Restart a server on the Orchestrator
 
-##### Servers
-
-Actions for multiple servers/server creation
-
-##### Server
+```
 
 #### API Examples
 
 ##### Create server
 
-Payload
+```url
+http://peon.za.cloudlet.cloud:5000/api/1.0/servers [POST]
+```
 
 ```json
 {
