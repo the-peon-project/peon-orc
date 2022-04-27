@@ -5,15 +5,13 @@ import json
 from modules import client, servers, settings, prefix
 from .shell import execute_shell
 
+root_path = "/root/peon"
+server_root_path = "{0}/servers".format(root_path)
 
 def server_get_uid(server):
-    return "{0}.{1}".format(server['game_uid'], server['servername'])
-
-
+    return "{0}.{1}".format(server['game_uid'], server['game_uid'])
 def servers_reload_current():
     logging.debug("Checking exisitng servers")
-    root_path = "/root/peon"
-    server_root_path = "{0}/servers".format(root_path)
     servers.clear()
     containers = client.containers.list(all)
     game_servers = []
@@ -35,18 +33,19 @@ def servers_reload_current():
         }
         servers.append(server)
 
+def server_update_description(server,description):
+    logging.debug("Updating {0}.{1}'s description to [{2}]".format(server['game_uid'],server['game_uid'],description))
+    with open("{0}/description".format("{0}/servers/{1}/{2}/description".format(root_path,server['game_uid'],server['game_uid'])), 'w') as f: f.write(description)
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.start()
 
-
 def server_stop(server_uid):
     logging.info("Stopping server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
-
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
@@ -67,8 +66,6 @@ def file_txt(path,content):
 def server_create(server_uid, description, settings=[]):
     # START
     error = "none"
-    root_path = "/root/peon"
-    server_root_path = "{0}/servers".format(root_path)
     plan_root_path = "{0}/plans".format(root_path)
     game_uid = server_uid.split('.')[0]
     server_name = server_uid.split('.')[1]
