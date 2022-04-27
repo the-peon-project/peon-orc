@@ -23,7 +23,6 @@ def servers_reload_current():
         server = {
             'game_uid': server_full_uid[2],
             'servername': server_full_uid[3],
-            'password': "**********",
             'state': game_server.status,
             'description': "- IMPLEMENT A DB -"
         }
@@ -99,35 +98,33 @@ def server_create(server_uid, settings=[]):
     del container_config["volumes"]["log_path"]
     # STEP 4 - Process settings
     for setting in settings:
-        print (setting)
         if 'env' in setting["type"]: container_config["variables"] = add_envs(container_config["variables"],setting["content"])
         elif 'json' in setting["type"]: file_json("{0}/config/{1}".format(server_path,setting["name"]),setting["content"])
         elif 'txt' in setting["type"]: file_txt("{0}/config/{1}".format(server_path,setting["name"]),setting["content"])
     # Set all file/path ownership
     execute_shell("chown -R 1000:1000 {0}".format(server_path))
     # STEP 5 - Start container
-    if "-REQUIRED-" in container_config["variables"]:
-        error = "Not all required settings were provided. Please confirm required settings."
+    if "-REQUIRED-" in container_config["variables"].values():
+        return "Not all required settings were provided. Please confirm required settings."
     try:
-        if error == "none":
-            container = client.containers.run(
-                container_config["image"],
-                name=container_name,
-                working_dir=container_config["working_directory"],
-                user=container_config["user"],
-                volumes=container_config["volumes"],
-                ports=container_config["ports"],
-                environment=container_config["variables"],
-                command=container_config["command"],
-                detach=True,
-                tty=True
-            )
-            # STEP 6: Run server scripts to deploy container
-            logging.debug("Executing commands in container")
-            logging.debug(" {0}".format(server_config["commands"]))
-            for shell_command in server_config["commands"]:
-                container.exec_run(
-                    shell_command, user=container_config["user"], environment=container_config["variables"], detach=True, tty=True)
+        container = client.containers.run(
+            container_config["image"],
+            name=container_name,
+            working_dir=container_config["working_directory"],
+            user=container_config["user"],
+            volumes=container_config["volumes"],
+            ports=container_config["ports"],
+            environment=container_config["variables"],
+            command=container_config["command"],
+            detach=True,
+            tty=True
+        )
+        # STEP 6: Run server scripts to deploy container
+        logging.debug("Executing commands in container")
+        logging.debug(" {0}".format(server_config["commands"]))
+        for shell_command in server_config["commands"]:
+            container.exec_run(
+                shell_command, user=container_config["user"], environment=container_config["variables"], detach=True, tty=True)
     except Exception as e:
         logging.error(traceback.format_exc())
         error = "Container failed to start. Please check orc.logs for details."
