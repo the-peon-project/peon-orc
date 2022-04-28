@@ -148,3 +148,8 @@ class Plans(Resource):
         return{"plans": [marshal(plan, planFields) for plan in plans]}
     
     # PUT - Update the plans file
+    def put(self):
+        logging.debug("APIv1 - Plans update List")
+        get_latest_plans_list()
+        plans = plans_get_current()
+        return{"plans": [marshal(plan, planFields) for plan in plans]}
