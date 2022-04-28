@@ -4,6 +4,7 @@ import traceback
 import json
 from modules import client, servers, prefix
 from .shell import execute_shell
+from .plans import *
 
 root_path = "/root/peon"
 server_root_path = "{0}/servers".format(root_path)
@@ -72,7 +73,7 @@ def server_create(server_uid, description, settings=[]):
     server_name = server_uid.split('.')[1]
     server_path = "{0}/{1}/{2}".format(server_root_path, game_uid, server_name)
     container_name = "{0}{1}".format(prefix, server_uid)
-    logging.info("Server deplyment requested [{0}]".format(container_name))
+    logging.info("Server deplyment requested [{0}]".format(container_name))# Pull latest server files
     # STEP 1: Initialise game paths
     execute_shell("mkdir -p {0}/data {0}/config {0}/logs".format(server_path))
     with open("{0}/description".format(server_path), 'w') as f: f.write(description)
