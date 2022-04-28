@@ -2,6 +2,7 @@
 from flask_restful import Resource, reqparse, abort, marshal, fields
 from modules import servers, settings
 from .servers import *
+from .plans import *
 import logging
 import traceback
 
@@ -11,6 +12,13 @@ serverFields = {
     "servername": fields.String,
     "state": fields.String,
     "description": fields.String
+}
+
+planFields = {
+    "game_uid": fields.String,
+    "title": fields.String,
+    "logo": fields.String,
+    "source": fields.String
 }
 
 class Server(Resource):
@@ -94,7 +102,7 @@ class Servers(Resource):
     # POST - Create a server
 
     def post(self):
-        logging.debug("APIv1 - Server Post/Create")
+        logging.debug("APIv1 - Server Create")
         args = self.reqparse.parse_args()
         server = {
             "game_uid": args["game_uid"],
@@ -121,3 +129,22 @@ class Servers(Resource):
         except Exception as e:
             logging.error(traceback.format_exc())
             return {"error": "Zer is a boog in ze code. Check the 'orc.log' for the traceback."}, 500
+
+class Plans(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            "game_uid", type=str, required=True, help="The PEON game id must be provided.", location="json")
+        self.reqparse.add_argument(
+            "title", type=str, required=True, help="A plan title must be provided", location="json")
+        self.reqparse.add_argument(
+            "logo", type=str, required=True, help="A plan logo must be provided", location="json")
+        self.reqparse.add_argument(
+            "source", type=str, required=True, help="The source files for the PEON plan must be provided.", location="json")
+    # GET - List all plans
+    def get(self):
+        logging.debug("APIv1 - Plans Get/List")
+        plans = plans_get_current()
+        return{"plans": [marshal(plan, planFields) for plan in plans]}
+    
+    # PUT - Update the plans file
