@@ -4,7 +4,7 @@ import traceback
 import json
 from pathlib import Path
 import urllib.request
-from shell import execute_shell
+from .shell import execute_shell
 
 root_path = "/root/peon"
 plan_path = "{0}/plans".format(root_path)
@@ -41,8 +41,9 @@ def download_shared_plan():
     rm -rf {0}/shared &&
     tar -xvf master.tar.gz &&
     cp -R peon-plans-master/shared . &&
-    rm -rf peon-plans-master && 
-    chown 1000:1000 shared
+    rm -rf peon-plans-master &&
+    rm -rf master.tar.gz &&
+    chown -R 1000:1000 shared
     '''.format(plan_path))
 
 
@@ -59,16 +60,18 @@ def download_game_plan(url):
         rm -rf {1} && 
         tar -xvf master.tar.gz && 
         mv {2} {1} && 
-        rm -rf master.tar.gz'''.format(plan_game_path,game_dir,main_dir)
+        rm -rf master.tar.gz &&
+        chown -R 1000:1000 {1}'''.format(plan_game_path,game_dir,main_dir)
         )
 
 def get_plan_url(game_uid):
     plans = plans_get_current()
+    error = "NOT-FOUND"
     for plan in plans:
         if plan["game_uid"] == game_uid:
             return plan["source"]
-        else:
-            return "NOT-FOUND"
+    return error
+            
 
 def get_plan(game_uid):
     logging.debug("Get plan for Game_UID [{0}]".format(game_uid))
