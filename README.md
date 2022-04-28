@@ -77,7 +77,9 @@ url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
         - [GET] Get a specific game server from the Orchestrator
         - [DEL] Delete a game server from the Orchestrator
         - [PUT] Update description or Start/Stop/Restart a game server on the Orchestrator
-
+    plans:
+        - [GET] List all plans on orchestrator
+        - [PUT] Get latest plans list from PEON project
 ```
 
 #### API Examples
