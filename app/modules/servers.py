@@ -2,7 +2,7 @@
 import logging
 import traceback
 import json
-from modules import client, servers, settings, prefix
+from modules import client, servers, prefix
 from .shell import execute_shell
 
 root_path = "/root/peon"
