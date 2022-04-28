@@ -30,7 +30,7 @@ Check [changelog](https://github.com/nox-noctua-consulting/peon-orc/blob/master/
 
 ### Known Bugs
 
--
+- Non existent recipies work unexpectedly!??!
 
 ### Architecture/Rules
 
@@ -51,7 +51,7 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 #### *sprint 0.3.0*
 
-- [ ] RESTapi (v1) - Plan/recipies
+- [x] RESTapi (v1) - Plan/recipies
 - [ ] Backups
 
 #### *sprint 0.4.0* 

@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.3-dev
+
+- API - Auto download latest plan version when server is deployed
+  
 ## 0.2.2-dev
 
 - API - Plans get list & update from Peon project list
