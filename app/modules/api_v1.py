@@ -117,10 +117,14 @@ class Servers(Resource):
                     return{"error": "Server already exists."}, 501
             if "settings" not in args.keys():
                 args["settings"] = []
-            error = server_create("{0}.{1}".format(
-                args["game_uid"],args["servername"]), 
-                args["description"],
-                args["settings"])
+            get_latest_plans_list()
+            download_shared_plan() # Pull latest shared files
+            error = get_plan(serv["game_uid"])
+            if error == "none":
+                error = server_create("{0}.{1}".format(
+                    args["game_uid"],args["servername"]), 
+                    args["description"],
+                    args["settings"])
             if error == "none":
                 servers.append(server)
                 return{"server": marshal(server, serverFields)}, 201
