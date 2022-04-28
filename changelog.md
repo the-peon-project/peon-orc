@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.2-dev
+
+- API - Plans get list & update from Peon project list
+
 ## 0.2.1-dev
 
 - Bugfix - Enforced description & settings on [post]servers
