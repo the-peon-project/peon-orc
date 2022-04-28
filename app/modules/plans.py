@@ -78,9 +78,9 @@ def get_plan(game_uid):
     url = get_plan_url(game_uid)
     if url != "NOT-FOUND":
         download_game_plan(url)
-        return json.load(open("{0}/{1}/config.json".format(plan_game_path,game_uid)))
+        return "none"
     else:
-        return {"error" : "Game not found"}
+        return "Game UID not found."
 
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_plans.log', filemode='a',
