@@ -118,7 +118,7 @@ class Servers(Resource):
             if "settings" not in args.keys():
                 args["settings"] = []
             get_latest_plans_list()
-            download_shared_plan() # Pull latest shared files
+            download_shared_plans() # Pull latest shared files
             error = get_plan(serv["game_uid"])
             if error == "none":
                 error = server_create("{0}.{1}".format(
@@ -132,7 +132,7 @@ class Servers(Resource):
                 return{"error" : error}, 501
         except Exception as e:
             logging.error(traceback.format_exc())
-            return {"error": "Zer is a boog in ze code. Check the 'orc.log' for the traceback."}, 500
+            return {"error": "Something bad happened. Check the logs for details. Please submit to (@peon devs) to improve error handling."}, 500
 
 class Plans(Resource):
     def __init__(self):

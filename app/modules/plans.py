@@ -31,7 +31,7 @@ def plans_get_current():
             logging.error(traceback.format_exc())
             return {"error":"Could not get latest plans."}
 
-def download_shared_plan():
+def download_shared_plans():
     logging.debug("Downloading shared plans".format())
     url = "https://github.com/nox-noctua-consulting/peon-plans/archive/master.tar.gz"
     urllib.request.urlretrieve(
