@@ -1,0 +1,315 @@
+swagger: "2.0"
+info:
+  description: "The API "
+  version: "1.0.0"
+  title: "PEON (Play Everything on Nodes)"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "richard@noxnoctua.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "dockerdev.za.cloudlet.cloud"
+basePath: "/api/1.0"
+tags:
+- name: "servers"
+  description: "Viewing all servers/creating a new server"
+- name: "server"
+  description: "Managing an existing server"
+- name: "plans"
+  description: "Actions on the War Plans registry"
+- name: "plan"
+  description: "Actions on a specific War Plan"
+schemes:
+- "http"
+paths:
+  /servers:
+    get:
+      tags:
+      - "servers"
+      summary: "Get a list of all existing servers on an Orchestrator"
+      description: ""
+      operationId: "getServers"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "List of servers on node"
+        "404":
+          description: "Command failed."
+    post:
+      tags:
+      - "servers"
+      summary: "Create a new game server"
+      description: "Deploy a new PEON WARCAMP, from a PEON WAR PLAN"
+      operationId: "createServer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Server configuration"
+        required: true
+        schema:
+          $ref: "#/definitions/server"
+      responses:
+        "405":
+          description: "Invalid input"
+  /server/{game_uid}.{servername}:
+    get:
+      tags:
+      - "server"
+      summary: "Finds Pets by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findPetsByStatus"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "game_uid"
+        in: "path"
+        description: "The PEON game unique ID"
+        required: true
+        type: "string"
+      - name: "servername"
+        in: "path"
+        description: "The unqiue name for the server."
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
+        "400":
+          description: "Invalid status value"
+  /plans:
+    get:
+      tags:
+      - "plans"
+      summary: "List all available plans"
+      description: "A call to pull the latest list of available plans from the Peon-Plans project."
+      operationId: "findPetsByTags"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
+        "400":
+          description: "Invalid tag value"
+      deprecated: false
+  /plan/{game_uid}:
+    get:
+      tags:
+      - "plan"
+      summary: "Get plan information"
+      description: "Returns a single plan"
+      operationId: "getPetById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "game_uid"
+        in: "path"
+        description: "The PEON game unique ID"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Pet"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+    post:
+      tags:
+      - "plan"
+      summary: "Updates a pet in the store with form data"
+      description: ""
+      operationId: "updatePetWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "game_uid"
+        in: "path"
+        description: "The PEON game unique ID"
+        required: true
+        type: "string"
+      responses:
+        "405":
+          description: "Invalid input"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "plan"
+      summary: "Deletes a pet"
+      description: ""
+      operationId: "deletePet"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "game_uid"
+        in: "path"
+        description: "The PEON game unique ID"
+        required: true
+        type: "string"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Order:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      petId:
+        type: "integer"
+        format: "int64"
+      quantity:
+        type: "integer"
+        format: "int32"
+      shipDate:
+        type: "string"
+        format: "date-time"
+      status:
+        type: "string"
+        description: "Order Status"
+        enum:
+        - "placed"
+        - "approved"
+        - "delivered"
+      complete:
+        type: "boolean"
+        default: false
+    xml:
+      name: "Order"
+  Category:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Category"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      userStatus:
+        type: "integer"
+        format: "int32"
+        description: "User Status"
+    xml:
+      name: "User"
+  Tag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Tag"
+  server:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      category:
+        $ref: "#/definitions/Category"
+      name:
+        type: "string"
+        example: "doggie"
+      photoUrls:
+        type: "array"
+        xml:
+          name: "photoUrl"
+          wrapped: true
+        items:
+          type: "string"
+      tags:
+        type: "array"
+        xml:
+          name: "tag"
+          wrapped: true
+        items:
+          $ref: "#/definitions/Tag"
+      status:
+        type: "string"
+        description: "pet status in the store"
+        enum:
+        - "available"
+        - "pending"
+        - "sold"
+    xml:
+      name: "Pet"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
