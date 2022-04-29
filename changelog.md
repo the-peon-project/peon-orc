@@ -1,5 +1,10 @@
 # PEON ORC - Changelog
 
+## 0.2.5-dev
+
+- API - Server - Reworked to include actions into path
+- API - Server - Added get with metrics
+
 ## 0.2.4-dev
 
 - API - Server Get - reworked to provide both container & server state
