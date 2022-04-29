@@ -28,7 +28,10 @@ def server_get(server_uid):
     try:
         server = server_get_server(client.containers.get(
             "{0}{1}".format(prefix, server_uid)))
-        return{"server": marshal(server, serverFields)}, 200
+        server["stats"] = server_get_stats(server_uid)
+        serverFieldsWithStats = serverFields.copy()
+        serverFieldsWithStats["stats"] = fields.String
+        return{"server": marshal(server, serverFieldsWithStats)}, 200
     except Exception as e:
         logging.error(traceback.format_exc())
         return {"error": "There was an issue getting the server."}, 404
