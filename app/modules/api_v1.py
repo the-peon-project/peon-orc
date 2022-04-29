@@ -43,58 +43,62 @@ class Server(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("game_uid", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
-        self.reqparse.add_argument("container_state", type=str, location="json")
+        self.reqparse.add_argument(
+            "container_state", type=str, location="json")
         self.reqparse.add_argument("server_state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
-    def get(self, server_uid):
+    def get(self, action, server_uid):
         logging.debug("APIv1 - Server Get")
         return server_get(server_uid)
 
     # PUT - Given an id
-    def put(self, server_uid):
-        logging.debug("APIv1 - Server Put")
-        server = [server for server in servers if server_get_uid(
-            server) == server_uid]
-        if len(server) == 0:
-            abort(404)
-        server = server[0]
-        # Loop Through all the passed agruments
-        args = self.reqparse.parse_args()
-        for key, value in args.items():
-            # Check if the passed value is not null
-            if value is not None:
-                # if not, set the element in the servers dict with the 'key' object to the value provided in the request.
-                server[key] = value
-                if key == "container_state":
-                    if value == "start":
-                        server_start(server_get_uid(server))
-                    elif value == "stop":
-                        server_stop(server_get_uid(server))
-                    elif value == "restart":
-                        server_restart(server_get_uid(server))
-                    # Let the services have a short period to process state change
-                    time.sleep(0.5)
-                if key == "description":
-                    server_update_description(server, server[key])
-                server_get(server_uid)
+    def put(self, action, server_uid):
+        logging.info(
+            "APIv1 - Server {0} - Action {1}".format(server_uid, action))
+        try:
+            server = server_get_server(client.containers.get(
+                "{0}{1}".format(prefix, server_uid)))
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
+        if action == "start":
+            server_start(server_uid)
+        elif action == "stop":
+            server_stop(server_uid)
+        elif action == "restart":
+            server_restart(server_uid)
+        elif action == "description":
+            try:
+                server_update_description(
+                    server, (self.reqparse.parse_args())["description"])
+            except:
+                return {"error": "The description argument was incorrectly provided."}, 404
+        else:
+            return {"error": "Unsupported action [{0}].".format(action)}, 404
+        time.sleep(0.5)
+        server = server_get_server(client.containers.get(
+            "{0}{1}".format(prefix, server_uid)))
         return{"server": marshal(server, serverFields)}, 200
 
     # DELETE - Remove a server
-    def delete(self, server_uid):
+    def delete(self, action, server_uid):
         logging.debug("APIv1 - Server Delete")
-        server = [server for server in servers if server_get_uid(
-            server) == server_uid]
-        if(len(server) == 0):
-            abort(404)
-        server_uid = "{0}.{1}".format(
-            server[0]["game_uid"], server[0]["servername"])
-        server_stop(server_uid)
-        server_delete(server_uid)
-        servers_get_all()
-        return {"success": "Server {0} was deleted.".format(server_uid)}, 200
+        if action == "delete":
+            try:
+                server_get_server(client.containers.get(
+                    "{0}{1}".format(prefix, server_uid)))
+            except Exception as e:
+                logging.error(traceback.format_exc())
+                return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
+            server_stop(server_uid)
+            server_delete(server_uid)
+            servers_get_all()
+            return {"success": "Server {0} was deleted.".format(server_uid)}, 200
+        else:
+            return {"error" : "Incorrect action [{0}] provided".format(action)}
 
 
 class Servers(Resource):

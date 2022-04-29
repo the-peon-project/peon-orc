@@ -13,12 +13,14 @@ server_root_path = "{0}/servers".format(root_path)
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'], server['servername'])
 
+
 def server_get_stats(server_uid):
     logging.debug("Getting stats")
     try:
         return client.containers.get("{0}{1}".format(prefix, server_uid)).stats(stream=False)
     except:
         return "Not available"
+
 
 def server_get_server(server):
     server_full_uid = (server.name).split('.')
@@ -29,17 +31,26 @@ def server_get_server(server):
             with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
                 server_state = f.read()
         else:
-            server_state = "UNKNOWN"            
+            server_state = "UNKNOWN"
     except:
         description = "None - Please add a description"
     server = {
         'game_uid': server_full_uid[2],
         'servername': server_full_uid[3],
         'container_state': server.status,
-        'server_state' : server_state,
+        'server_state': server_state,
         'description': description
     }
     return server
+
+
+def server_check(server_uid):
+    logging.debug("Checking if server exists")
+    try:
+        return client.containers.get("{0}{1}".format(prefix, server_uid))
+    except:
+        return "error"
+
 
 def servers_get_all():
     logging.debug("Checking exisitng servers")
@@ -71,10 +82,12 @@ def server_stop(server_uid):
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
 
+
 def server_restart(server_uid):
     logging.info("Restarting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.restart()
+
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
@@ -141,11 +154,14 @@ def server_create(server_uid, description, settings=[]):
     # STEP 4 - Process settings
     for setting in settings:
         if 'env' in setting["type"]:
-            container_config["variables"] = add_envs(container_config["variables"], setting["content"])
+            container_config["variables"] = add_envs(
+                container_config["variables"], setting["content"])
         elif 'json' in setting["type"]:
-            file_json("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
+            file_json("{0}/config/{1}".format(server_path,
+                      setting["name"]), setting["content"])
         elif 'txt' in setting["type"]:
-            file_txt("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
+            file_txt("{0}/config/{1}".format(server_path,
+                     setting["name"]), setting["content"])
     # Set all file/path ownership
     execute_shell("chown -R 1000:1000 {0}".format(server_path))
     # STEP 5 - Start container
