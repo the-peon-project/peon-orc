@@ -33,6 +33,7 @@ class Server(Resource):
             "container_state", type=str, location="json")
         self.reqparse.add_argument("server_state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
+        self.reqparse.add_argument("eradicate", type=str, location="json")
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
@@ -83,19 +84,27 @@ class Server(Resource):
     # DELETE - Remove a server
     def delete(self, action, server_uid):
         logging.debug("APIv1 - Server Delete")
-        if action == "delete":
+        note = ""
+        if action not in ["destroy","eradicate"]:
+            return {"error" : "Incorrect action [{0}] provided".format(action)}, 404
+        if action == "destroy":
             try:
                 server_get_server(client.containers.get(
                     "{0}{1}".format(prefix, server_uid)))
             except Exception as e:
                 logging.error(traceback.format_exc())
-                return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
+                return {"error": "The server {0} is inaccessible. Is the name valid?".format(server_uid)}, 404
             server_stop(server_uid)
             server_delete(server_uid)
             servers_get_all()
-            return {"success": "Server {0} was deleted.".format(server_uid)}, 200
-        else:
-            return {"error" : "Incorrect action [{0}] provided".format(action)}
+            note = "Server {0} was removed."
+        args = self.reqparse.parse_args()
+        print(args)
+        if "eradicate" in args:
+            if args["eradicate"] == "True":
+                server_delete_files(server_uid)
+                note = note + "All files for {0} have been removed."
+        return {"success": note.format(server_uid)}, 200
 
 
 class Servers(Resource):
@@ -144,7 +153,8 @@ class Servers(Resource):
             if error == "none":
                 servers.append(server)
                 time.sleep(0.5)
-                return server_get("{0}.{1}".format(args["game_uid"], args["servername"]))
+                return server_get_server(client.containers.get(
+                    "{0}{1}.{2}".format(prefix, args["game_uid"],args["servername"])))
             else:
                 return{"error": error}, 501
         except Exception as e:

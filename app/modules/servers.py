@@ -89,6 +89,9 @@ def server_restart(server_uid):
     container.restart()
 
 
+def server_delete_files(server_uid):
+    execute_shell("rm -rf {0}/{1}".format(server_root_path,str(server_uid).replace(".","/")))
+
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
