@@ -76,8 +76,8 @@ definitions:
       settings:
         type: array
         items:
-          $ref: "#/definitions/servers-environment-variables"
-  servers-environment-variables:
+          $ref: "#/definitions/servers.settings.environment-variables"
+  servers.settings.environment-variables:
     description: "Configuring environment variables in your game server."
     type: "object"
     required:
@@ -94,8 +94,8 @@ definitions:
         format: string
         example: "Environment Variables"
       content:
-        $ref: "#/definitions/servers-environment-variables-example"
-  servers-environment-variables-example:
+        $ref: "#/definitions/servers.settings.environment-variables.content"
+  servers.settings.environment-variables.content:
     description: "DIFFERENT FOR EACH GAME.\n E.g: Valhiem specific server settings (found in game plan)."
     type: "object"
     properties:
@@ -111,7 +111,7 @@ definitions:
         type: string
         format: string
         example: "password123"
-  servers-json-file:
+  servers.settings.json-file:
     description: "Create a JSON file in ../servers/{game_uid}/{servername}/config/"
     type: "object"
     required:
@@ -135,7 +135,7 @@ definitions:
             "key1" : "value1"
             "key2" : "value2"
             "key3" : ["item1","item2"]
-  servers-text-file:
+  servers.settings.text-file:
     description: "Create a TEXT file in ../servers/{game_uid}/{servername}/config/"
     type: "object"
     required:
