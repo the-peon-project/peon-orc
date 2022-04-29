@@ -64,6 +64,10 @@ def server_stop(server_uid):
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
 
+def server_restart(server_uid):
+    logging.info("Restarting server [{0}]".format(server_uid))
+    container = client.containers.get("{0}{1}".format(prefix, server_uid))
+    container.restart()
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))

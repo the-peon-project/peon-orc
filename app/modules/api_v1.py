@@ -72,8 +72,7 @@ class Server(Resource):
                     elif value == "stop":
                         server_stop(server_get_uid(server))
                     elif value == "restart":
-                        server_stop(server_get_uid(server))
-                        server_start(server_get_uid(server))
+                        server_restart(server_get_uid(server))
                     # Let the services have a short period to process state change
                     time.sleep(0.5)
                 if key == "description":
