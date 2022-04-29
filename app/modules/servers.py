@@ -13,6 +13,13 @@ server_root_path = "{0}/servers".format(root_path)
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'], server['servername'])
 
+def server_get_stats(server_uid):
+    logging.debug("Getting stats")
+    try:
+        return client.containers.get("{0}{1}".format(prefix, server_uid)).stats(stream=False)
+    except:
+        return "Not available"
+
 def server_get_server(server):
     server_full_uid = (server.name).split('.')
     try:
