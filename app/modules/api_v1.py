@@ -1,16 +1,18 @@
 #!/usr/bin/python3
 from flask_restful import Resource, reqparse, abort, marshal, fields
-from modules import servers, settings
+from modules import servers, settings, prefix
 from .servers import *
 from .plans import *
 import logging
 import traceback
+import time
 
 # Schema For the Server Request JSON
 serverFields = {
     "game_uid": fields.String,
     "servername": fields.String,
-    "state": fields.String,
+    "container_state": fields.String,
+    "server_state": fields.String,
     "description": fields.String
 }
 
@@ -27,18 +29,20 @@ class Server(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("game_uid", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
-        self.reqparse.add_argument("state", type=str, location="json")
+        self.reqparse.add_argument("container_state", type=str, location="json")
+        self.reqparse.add_argument("server_state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
     def get(self, server_uid):
         logging.debug("APIv1 - Server Get")
-        server = [server for server in servers if server_get_uid(
-            server) == server_uid]
-        if(len(server) == 0):
-            abort(404)
-        return{"server": marshal(server[0], serverFields)}
+        try:
+            server = server_get_server(client.containers.get("{0}{1}".format(prefix,server_uid)))
+            return{"server": marshal(server, serverFields)}, 200
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return {"error": "Server container not found."}, 404
 
     # PUT - Given an id
     def put(self, server_uid):
@@ -55,7 +59,7 @@ class Server(Resource):
             if value is not None:
                 # if not, set the element in the servers dict with the 'key' object to the value provided in the request.
                 server[key] = value
-                if key == "state":
+                if key == "container_state":
                     if value == "start":
                         server_start(server_get_uid(server))
                     elif value == "stop":
@@ -63,9 +67,16 @@ class Server(Resource):
                     elif value == "restart":
                         server_stop(server_get_uid(server))
                         server_start(server_get_uid(server))
+                    time.sleep(0.5) # Let the services have a short period to process state change
                 if key == "description":
                     server_update_description(server,server[key])
-        return{"server": marshal(server, serverFields)}
+                try:
+                    server = server_get_server(client.containers.get("{0}{1}".format(prefix,server_uid)))
+                    return{"server": marshal(server, serverFields)}, 200
+                except Exception as e:
+                    logging.error(traceback.format_exc())
+                    return {"error": "Something went wrong. Please try again."}, 404
+        return{"server": marshal(server, serverFields)}, 200
     
     # DELETE - Remove a server
     def delete(self, server_uid):
@@ -78,7 +89,7 @@ class Server(Resource):
             server[0]["game_uid"], server[0]["servername"])
         server_stop(server_uid)
         server_delete(server_uid)
-        servers_reload_current()
+        servers_get_all()
         return {"success": "Server {0} was deleted.".format(server_uid)}, 200
 
 
@@ -97,7 +108,7 @@ class Servers(Resource):
 
     def get(self):
         logging.debug("APIv1 - Servers Get/List")
-        servers_reload_current()
+        servers_get_all()
         return{"servers": [marshal(server, serverFields) for server in servers]}
     # POST - Create a server
 
@@ -111,7 +122,7 @@ class Servers(Resource):
             "settings" : args["settings"]
         }
         try:
-            servers_reload_current()
+            servers_get_all()
             for serv in servers:
                 if args["game_uid"] == serv["game_uid"] and args["servername"] == serv["servername"]:
                     return{"error": "Server already exists."}, 501

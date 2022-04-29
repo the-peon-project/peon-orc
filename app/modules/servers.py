@@ -13,8 +13,28 @@ server_root_path = "{0}/servers".format(root_path)
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'], server['servername'])
 
+def server_get_server(server):
+    server_full_uid = (server.name).split('.')
+    try:
+        with open('{0}/{1}/{2}/description'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
+            description = f.read()
+        if server.status == "running":
+            with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
+                server_state = f.read()
+        else:
+            server_state = "unknown"            
+    except:
+        description = "None - Please add a description"
+    server = {
+        'game_uid': server_full_uid[2],
+        'servername': server_full_uid[3],
+        'container_state': server.status,
+        'server_state' : server_state,
+        'description': description
+    }
+    return server
 
-def servers_reload_current():
+def servers_get_all():
     logging.debug("Checking exisitng servers")
     servers.clear()
     containers = client.containers.list(all)
@@ -22,20 +42,8 @@ def servers_reload_current():
     for game_server in containers:
         if prefix in game_server.name:
             game_servers.append(game_server)
-    for game_server in game_servers:
-        server_full_uid = (game_server.name).split('.')
-        try:
-            with open('{0}/{1}/{2}/description'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
-                description = f.read()
-        except:
-            description = ""
-        server = {
-            'game_uid': server_full_uid[2],
-            'servername': server_full_uid[3],
-            'state': game_server.status,
-            'description': description
-        }
-        servers.append(server)
+    for server in game_servers:
+        servers.append(server_get_server(server))
 
 
 def server_update_description(server, description):

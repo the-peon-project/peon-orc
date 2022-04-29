@@ -18,7 +18,7 @@ api_v1.add_resource(Plans, "/api/1.0/plans")
 
 # Start flask listener
 if __name__ == "__main__":
-    servers_reload_current()
+    servers_get_all()
     logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     logging.debug(app.run(host="0.0.0.0", port=5000, debug=True))
     
