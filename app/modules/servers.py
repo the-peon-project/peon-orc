@@ -9,8 +9,10 @@ from .plans import *
 root_path = "/root/peon"
 server_root_path = "{0}/servers".format(root_path)
 
+
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'], server['servername'])
+
 
 def servers_reload_current():
     logging.debug("Checking exisitng servers")
@@ -22,8 +24,8 @@ def servers_reload_current():
             game_servers.append(game_server)
     for game_server in game_servers:
         server_full_uid = (game_server.name).split('.')
-        try: 
-            with open('{0}/{1}/{2}/description'.format(server_root_path,server_full_uid[2],server_full_uid[3]), 'r') as f:
+        try:
+            with open('{0}/{1}/{2}/description'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
                 description = f.read()
         except:
             description = ""
@@ -35,35 +37,47 @@ def servers_reload_current():
         }
         servers.append(server)
 
-def server_update_description(server,description):
-    logging.debug("Updating {0}.{1}'s description to [{2}]".format(server['game_uid'],server['servername'],description))
-    with open("{0}/servers/{1}/{2}/description".format(root_path,server['game_uid'],server['servername']), 'w') as f: f.write(description)
+
+def server_update_description(server, description):
+    logging.debug("Updating {0}.{1}'s description to [{2}]".format(
+        server['game_uid'], server['servername'], description))
+    with open("{0}/servers/{1}/{2}/description".format(root_path, server['game_uid'], server['servername']), 'w') as f:
+        f.write(description)
+
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.start()
 
+
 def server_stop(server_uid):
     logging.info("Stopping server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
+
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.remove()
 
-def add_envs(env_vars,content):
+
+def add_envs(env_vars, content):
     for key in content.keys():
         env_vars[key] = content[key]
     return env_vars
 
-def file_json(path,content):
-    with open(path, 'w') as f: json.dump(content, f)
 
-def file_txt(path,content):
-    with open(path, 'w') as f: f.write(content)
+def file_json(path, content):
+    with open(path, 'w') as f:
+        json.dump(content, f)
+
+
+def file_txt(path, content):
+    with open(path, 'w') as f:
+        f.write(content)
+
 
 def server_create(server_uid, description, settings=[]):
     # START
@@ -73,10 +87,12 @@ def server_create(server_uid, description, settings=[]):
     server_name = server_uid.split('.')[1]
     server_path = "{0}/{1}/{2}".format(server_root_path, game_uid, server_name)
     container_name = "{0}{1}".format(prefix, server_uid)
-    logging.info("Server deplyment requested [{0}]".format(container_name))# Pull latest server files
+    logging.info("Server deplyment requested [{0}]".format(
+        container_name))  # Pull latest server files
     # STEP 1: Initialise game paths
     execute_shell("mkdir -p {0}/data {0}/config {0}/logs".format(server_path))
-    with open("{0}/description".format(server_path), 'w') as f: f.write(description)
+    with open("{0}/description".format(server_path), 'w') as f:
+        f.write(description)
     # STEP 2: Import plan config data
     config = json.load(
         open("{0}/games/{1}/config.json".format(plan_root_path, game_uid), 'r'))
@@ -105,9 +121,12 @@ def server_create(server_uid, description, settings=[]):
     del container_config["volumes"]["log_path"]
     # STEP 4 - Process settings
     for setting in settings:
-        if 'env' in setting["type"]: container_config["variables"] = add_envs(container_config["variables"],setting["content"])
-        elif 'json' in setting["type"]: file_json("{0}/config/{1}".format(server_path,setting["name"]),setting["content"])
-        elif 'txt' in setting["type"]: file_txt("{0}/config/{1}".format(server_path,setting["name"]),setting["content"])
+        if 'env' in setting["type"]:
+            container_config["variables"] = add_envs(container_config["variables"], setting["content"])
+        elif 'json' in setting["type"]:
+            file_json("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
+        elif 'txt' in setting["type"]:
+            file_txt("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
     # Set all file/path ownership
     execute_shell("chown -R 1000:1000 {0}".format(server_path))
     # STEP 5 - Start container
@@ -135,10 +154,11 @@ def server_create(server_uid, description, settings=[]):
     except Exception as e:
         logging.error(traceback.format_exc())
         error = "Container failed to start. Please check orc.logs for details."
-        try: 
+        try:
             container.remove()
         except:
-            logging.warn("Failed container [{0}] was not removed.".format(container_name))
+            logging.warn(
+                "Failed container [{0}] was not removed.".format(container_name))
     return error
 
 
