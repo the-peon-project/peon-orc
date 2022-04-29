@@ -74,9 +74,11 @@ definitions:
         format: string
         example: My PEON Valhiem server
       settings:
-        $ref: "#/definitions/settings"
-  settings:
-    description: "JSON data required for each unique PEON WAR PLAN."
+        type: array
+        items:
+          $ref: "#/definitions/servers-environment-variables"
+  servers-environment-variables:
+    description: "Configuring environment variables in your game server."
     type: "object"
     required:
       - type
@@ -90,10 +92,10 @@ definitions:
       name:
         type: string
         format: string
-        example: "container environment"
+        example: "Environment Variables"
       content:
-        $ref: "#/definitions/content"
-  content:
+        $ref: "#/definitions/servers-environment-variables-example"
+  servers-environment-variables-example:
     description: "DIFFERENT FOR EACH GAME.\n E.g: Valhiem specific server settings (found in game plan)."
     type: "object"
     properties:
@@ -108,4 +110,48 @@ definitions:
       PASSWORD:
         type: string
         format: string
-        example: "password123"   
+        example: "password123"
+  servers-json-file:
+    description: "Create a JSON file in ../servers/{game_uid}/{servername}/config/"
+    type: "object"
+    required:
+      - type
+      - name
+      - content
+    properties:
+      type:
+        type: string
+        format: string
+        example: "json"
+      name:
+        type: string
+        format: string
+        example: "my-file-name.json"
+      content:
+        type: object
+        additionalProperties:
+          type: string
+          example:
+            "key1" : "value1"
+            "key2" : "value2"
+            "key3" : ["item1","item2"]
+  servers-text-file:
+    description: "Create a TEXT file in ../servers/{game_uid}/{servername}/config/"
+    type: "object"
+    required:
+      - type
+      - name
+      - content
+    properties:
+      type:
+        type: string
+        format: string
+        example: "txt"
+      name:
+        type: string
+        format: string
+        example: "my-file-name.some-extension"
+      content:
+        type: string
+        format: string
+        example: "My text file.\\nWith some content in it.\\n\\n"
