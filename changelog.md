@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.4-dev
+
+- API - Server Get - reworked to provide both container & server state
+
 ## 0.2.3-dev
 
 - API - Auto download latest plan version when server is deployed
