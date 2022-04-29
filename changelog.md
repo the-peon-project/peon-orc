@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.6-dev
+
+- API - Server - Destroy & Eradicate
+
 ## 0.2.5-dev
 
 - API - Server - Reworked to include actions into path
