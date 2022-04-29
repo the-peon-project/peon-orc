@@ -22,7 +22,7 @@ def server_get_server(server):
             with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
                 server_state = f.read()
         else:
-            server_state = "unknown"            
+            server_state = "UNKNOWN"            
     except:
         description = "None - Please add a description"
     server = {
