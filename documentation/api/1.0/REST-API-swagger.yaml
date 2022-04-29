@@ -24,8 +24,8 @@ paths:
     get:
       tags:
         - "Servers"
-      summary: "Get a list of all existing servers on an Orchestrator"
-      description: ""
+      summary: "Scout the entire PEON War Party"
+      description: "Get the high level information on a PEON orchestrator."
       operationId: "getServers"
       produces:
         - "application/json"
@@ -37,8 +37,8 @@ paths:
     post:
       tags:
         - "Servers"
-      summary: "Create a new game server"
-      description: "Deploy a new PEON WARCAMP, from a PEON WAR PLAN"
+      summary: "Deploy a new PEON War Camp"
+      description: "Deploy a new game server to the Orchestrator."
       operationId: "createServer"
       consumes:
         - "application/json"
@@ -54,12 +54,12 @@ paths:
       responses:
         "405":
           description: "Invalid input"
-  /server/{game_uid}.{servername}:
+  /server/get/{game_uid}.{servername}:
     get:
       tags:
         - "Server"
-      summary: "Get a specific server's information"
-      description: "Get information from a specific server on a PEON Orchestrator."
+      summary: "Scout a PEON Warcamp"
+      description: "Get high level information from a specific server on a PEON Orchestrator."
       operationId: "getServer"
       parameters:
         - name: "game_uid"
@@ -79,14 +79,38 @@ paths:
           description: "Details of a specific server."
         "404":
           description: "Command failed."
+  /server/stats/{game_uid}.{servername}:
+    get:
+      tags:
+        - "Server"
+      summary: "Get the full inventory of a PEON Warcamp"
+      description: "Get information from a specific server on a PEON Orchestrator with extended metrics/statistics."
+      operationId: "getServerStats"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Details of a specific server with container metrics/statistics."
+        "404":
+          description: "Command failed."
+  /server/start/{game_uid}.{servername}:
     put:
       tags:
         - "Server"
-      summary: "Manage a server."
-      description: "Manage a server. START/STOP/RESTART & update DESCRIPTION"
-      operationId: "manageServer"
-      consumes:
-      - "application/json"
+      summary: "Start a PEON Warcamp"
+      description: "Trigger the container start of a specific PEON container's game server."
+      operationId: "startServer"
       parameters:
         - name: "game_uid"
           in: "path"
@@ -98,23 +122,101 @@ paths:
           description: "The unqiue name for the server."
           required: true
           type: "string"
-        - in: "body"
-          name: "body"
-          description: "Simple json server instruction"
-          required: true
       produces:
         - "application/json"
       responses:
         "200":
-          description: "Details of a specific server."
+          description: "JSON of basic server information."
         "404":
           description: "Command failed."
+  /server/stop/{game_uid}.{servername}:
+    put:
+      tags:
+        - "Server"
+      summary: "Stop a PEON Warcamp"
+      description: "Trigger the container stop of a specific PEON container's game server."
+      operationId: "stopServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "JSON of basic server information."
+        "404":
+          description: "Command failed."
+  /server/restart/{game_uid}.{servername}:
+    put:
+      tags:
+        - "Server"
+      summary: "Restart a PEON Warcamp"
+      description: "Trigger the container restart of a specific PEON container's game server."
+      operationId: "restartServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "JSON of basic server information."
+        "404":
+          description: "Command failed."
+  /server/description/{game_uid}.{servername}:
+    put:
+      tags:
+        - "Server"
+      summary: "Change motto of a PEON Warcamp"
+      description: "Trigger the container restart of a specific PEON container's game server."
+      operationId: "descriptionServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+        - name: "body"
+          in: "body"
+          description: "New server description."
+          required: true
+          schema:
+            $ref: "#/definitions/server.description"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "JSON of basic server information."
+        "404":
+          description: "Command failed."
+  /server/destroy/{game_uid}.{servername}:
     delete:
       tags:
         - "Server"
-      summary: "Get a specific server's information"
-      description: "Delete a sever on an Orchestrator."
-      operationId: "delServer"
+      summary: "Disband a PEON Warcamp, with the option to eradicate it."
+      description: "Remove a PEON game server. Add eradicate switch to remove config files."
+      operationId: "destroyServer"
       parameters:
         - name: "game_uid"
           in: "path"
@@ -126,11 +228,48 @@ paths:
           description: "The unqiue name for the server."
           required: true
           type: "string"
+        - name: "body"
+          in: "body"
+          description: "Optional remove "
+          required: false
+          schema:
+            $ref: "#/definitions/server.destroy"
       produces:
         - "application/json"
       responses:
         "200":
-          description: "Details of a specific server."
+          description: "JSON of basic server information."
+        "404":
+          description: "Command failed."
+  /server/eradicate/{game_uid}.{servername}:
+    delete:
+      tags:
+        - "Server"
+      summary: "Remove the last remaining remnants of a PEON War Camp."
+      description: "Delete all files of a removed game server."
+      operationId: "eradicateServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+        - name: "body"
+          in: "body"
+          description: "Manditory confirmation on data delete."
+          required: true
+          schema:
+            $ref: "#/definitions/server.destroy"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "JSON of basic server information."
         "404":
           description: "Command failed."
 definitions:
@@ -237,3 +376,25 @@ definitions:
         type: string
         format: string
         example: "My text file.\\nWith some content in it.\\n\\n"
+  server.description:
+    description: "The new description for the server."
+    type: "object"
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        format: string
+        example: "My awesome PEON game server."
+  server.destroy:
+    description: "A flag to explicitely delete all custom settings/data for a server."
+    type: "object"
+    required:
+      - description
+    properties:
+      eradicate:
+        type: string
+        format: string
+        example: "True"
+
+        
