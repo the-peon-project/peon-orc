@@ -1,3 +1,4 @@
+# curl -X 'GET' 'http://dockerdev.za.cloudlet.cloud:5000/api/1.0/servers' -H 'accept: application/json'
 swagger: "2.0"
 info:
   description: "The API "
@@ -9,11 +10,13 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "dockerdev.za.cloudlet.cloud"
+host: "dockerdev.za.cloudlet.cloud:5000"
 basePath: "/api/1.0"
 tags:
   - name: "Servers"
     description: "Viewing all servers/creating a new server"
+  - name: "Server"
+    description: "Managing an existing server."
 schemes:
   - "http"
 paths:
@@ -51,6 +54,85 @@ paths:
       responses:
         "405":
           description: "Invalid input"
+  /server/{game_uid}.{servername}:
+    get:
+      tags:
+        - "Server"
+      summary: "Get a specific server's information"
+      description: "Get information from a specific server on a PEON Orchestrator."
+      operationId: "getServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Details of a specific server."
+        "404":
+          description: "Command failed."
+    put:
+      tags:
+        - "Server"
+      summary: "Manage a server."
+      description: "Manage a server. START/STOP/RESTART & update DESCRIPTION"
+      operationId: "manageServer"
+      consumes:
+      - "application/json"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Simple json server instruction"
+          required: true
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Details of a specific server."
+        "404":
+          description: "Command failed."
+    delete:
+      tags:
+        - "Server"
+      summary: "Get a specific server's information"
+      description: "Delete a sever on an Orchestrator."
+      operationId: "delServer"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "The PEON game unique ID"
+          required: true
+          type: "string"
+        - name: "servername"
+          in: "path"
+          description: "The unqiue name for the server."
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Details of a specific server."
+        "404":
+          description: "Command failed."
 definitions:
   servers:
     description: "The PEON Orchestrator container settings."
