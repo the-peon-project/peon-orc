@@ -23,20 +23,6 @@ planFields = {
     "source": fields.String
 }
 
-
-def server_get(server_uid):
-    try:
-        server = server_get_server(client.containers.get(
-            "{0}{1}".format(prefix, server_uid)))
-        #server["stats"] = server_get_stats(server_uid)
-        #serverFieldsWithStats = serverFields.copy()
-        #serverFieldsWithStats["stats"] = fields.String
-        return{"server": marshal(server, serverFields)}, 200
-    except Exception as e:
-        logging.error(traceback.format_exc())
-        return {"error": "There was an issue getting the server."}, 404
-
-
 class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
@@ -51,8 +37,19 @@ class Server(Resource):
 
     # GET - Returns a single server object given a matching id
     def get(self, action, server_uid):
-        logging.debug("APIv1 - Server Get")
-        return server_get(server_uid)
+        logging.debug("APIv1 - Server Get - [{0}]".format(action))
+        try:
+            server = server_get_server(client.containers.get(
+                "{0}{1}".format(prefix, server_uid)))
+            if action == "stats":
+                server["stats"] = server_get_stats(server_uid)
+                serverFieldsWithStats = serverFields.copy()
+                serverFieldsWithStats["stats"] = fields.String
+                return{"server": marshal(server, serverFieldsWithStats)}, 200
+            return{"server": marshal(server, serverFields)}, 200
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return {"error": "There was an issue getting the server."}, 404
 
     # PUT - Given an id
     def put(self, action, server_uid):
