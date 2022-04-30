@@ -1,4 +1,4 @@
-# curl -X 'GET' 'http://dockerdev.za.cloudlet.cloud:5000/api/1.0/servers' -H 'accept: application/json'
+# Using SWAGGER
 swagger: "2.0"
 info:
   description: "The API "
