@@ -66,9 +66,10 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 RESTful API
 
-Authirization - ``Api-Key``
+Authorization - ``Api-Key``
 
-Hardcoded key - for test ``my-super-secret-api-key``
+API-KEY ``my-super-secret-api-key``
+> Hard coded as user control is not yet implemented
 
 This API expects a JSON payload in most cases.
 
