@@ -1,8 +1,10 @@
 #!/usr/bin/python3
+from flask import request
 from flask_restful import Resource, reqparse, abort, marshal, fields
 from modules import servers, settings, prefix
 from .servers import *
 from .plans import *
+from .security import *
 import logging
 import traceback
 import time
@@ -39,6 +41,7 @@ class Server(Resource):
     # GET - Returns a single server object given a matching id
     def get(self, action, server_uid):
         logging.debug("APIv1 - Server Get - [{0}]".format(action))
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         try:
             server = server_get_server(client.containers.get(
                 "{0}{1}".format(prefix, server_uid)))
@@ -56,6 +59,7 @@ class Server(Resource):
     def put(self, action, server_uid):
         logging.info(
             "APIv1 - Server {0} - Action {1}".format(server_uid, action))
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         try:
             server = server_get_server(client.containers.get(
                 "{0}{1}".format(prefix, server_uid)))
@@ -84,6 +88,7 @@ class Server(Resource):
     # DELETE - Remove a server
     def delete(self, action, server_uid):
         logging.debug("APIv1 - Server Delete")
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         note = ""
         if action not in ["destroy","eradicate"]:
             return {"error" : "Incorrect action [{0}] provided".format(action)}, 404
@@ -122,12 +127,14 @@ class Servers(Resource):
 
     def get(self):
         logging.debug("APIv1 - Servers Get/List")
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         servers_get_all()
         return{"servers": [marshal(server, serverFields) for server in servers]}
     # POST - Create a server
 
     def post(self):
         logging.debug("APIv1 - Server Create")
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         args = self.reqparse.parse_args()
         server = {
             "game_uid": args["game_uid"],
@@ -177,12 +184,14 @@ class Plans(Resource):
 
     def get(self):
         logging.debug("APIv1 - Plans Get/List")
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         plans = plans_get_current()
         return{"plans": [marshal(plan, planFields) for plan in plans]}
 
     # PUT - Update the plans file
     def put(self):
         logging.debug("APIv1 - Plans update List")
+        if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         get_latest_plans_list()
         plans = plans_get_current()
         return{"plans": [marshal(plan, planFields) for plan in plans]}
