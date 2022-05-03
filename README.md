@@ -66,17 +66,39 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 RESTful API
 
+Authirization - ``Api-Key``
+
+Hardcoded key - for test ``my-super-secret-api-key``
+
 This API expects a JSON payload in most cases.
+
+[API Docs](http://api.peon.noxnoctua.com/)
 
 ```yaml
 url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
     servers:
         - [GET] List all servers registered to Orchestrator
         - [POST] Create a new game server on orchestrator
-    server:
-        - [GET] Get a specific game server from the Orchestrator
-        - [DEL] Delete a game server from the Orchestrator
-        - [PUT] Update description or Start/Stop/Restart a game server on the Orchestrator
+        
+    server/get/GAME_UID.SERVERNAME:
+        - [GET] Get details of a game server
+    server/stats/GAME_UID.SERVERNAME:
+        - [GET] Get details of a game server, with performance statistics
+    server/start/GAME_UID.SERVERNAME:
+        - [PUT] Start a specific game server from the Orchestrator
+    server/stop/GAME_UID.SERVERNAME:
+        - [PUT] Stop a specific game server from the Orchestrator
+    server/restart/GAME_UID.SERVERNAME:
+        - [PUT] Restart a specific game server from the Orchestrator
+    server/description/GAME_UID.SERVERNAME:
+        - [PUT] Update the description of a specific game server from the Orchestrator
+    server/destroy/GAME_UID.SERVERNAME:
+        - [DEL] Removes a game container leaving server and config files intact (optional flag to delete all files as well)
+        body: { "eradicate" : "True" } *Optional (destructive data removal)
+    server/eradicate/GAME_UID.SERVERNAME:
+        - [DEL] Deletes all game data & config files
+        body: { "eradicate" : "True" } *Required
+
     plans:
         - [GET] List all plans on orchestrator
         - [PUT] Get latest plans list from PEON project
