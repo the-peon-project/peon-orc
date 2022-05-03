@@ -1,5 +1,6 @@
 pipenv
 flask
 flask-restful
+flask_cors
 docker
 paramiko
