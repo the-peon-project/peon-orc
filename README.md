@@ -54,7 +54,7 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 - [x] RESTapi (v1) - Plan/recipies
 - [ ] Backups
 
-#### *sprint 0.4.0* 
+#### *sprint 0.4.0*
 
 - [ ] RESTapi (v1) - Console
 
