@@ -7,8 +7,14 @@ from flask_restful import Api
 from modules.api_v1 import *
 from modules.servers import *
 
+# Configure CORS (secure http/s requests)
+from flask_cors import CORS
+cors_allowed_headers=["Content-Type", "api_key", "Authorization"]
+cors_allowed_methods=["GET","POST","DELETE","PUT","PATCH","OPTIONS"]
+
 # Initialize Flask
 app = Flask(__name__)
+CORS(app,allow_headers=cors_allowed_headers,methods=cors_allowed_methods)
 api_v1 = Api(app)
 
 api_v1.add_resource(Servers, "/api/1.0/servers")
