@@ -1,5 +1,10 @@
 # PEON ORC - Changelog
 
+## 0.2.7-dev
+
+- Security - Inital CORS implementation
+- Security - Initial api-key requirement implementation
+
 ## 0.2.6-dev
 
 - API - Server - Destroy & Eradicate
