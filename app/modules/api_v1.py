@@ -151,7 +151,7 @@ class Servers(Resource):
                 args["settings"] = []
             get_latest_plans_list()
             download_shared_plans()  # Pull latest shared files
-            error = get_plan(serv["game_uid"])
+            error = get_plan(args["game_uid"])
             if error == "none":
                 error = server_create("{0}.{1}".format(
                     args["game_uid"], args["servername"]),
