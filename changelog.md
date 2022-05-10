@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.9-dev
+
+- UI - Added MOTD to container login
+
 ## 0.2.8-dev
 
 - Base Image Update - Base images were repulled to get latest versions & app rebuilt on those
