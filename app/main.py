@@ -13,12 +13,10 @@ cors_allowed_headers=["Content-Type", "api_key", "Authorization"]
 cors_allowed_methods=["GET","POST","DELETE","PUT","PATCH","OPTIONS"]
 
 # Scheduler
-import datetime
-import time
-from apscheduler.schedulers.background import BackgroundScheduler
-
-def timedTask():
-    print(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3])
+from datetime import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
+def my_job(text):
+    print(text)
 
 # Initialize Flask
 app = Flask(__name__)
@@ -32,14 +30,9 @@ api_v1.add_resource(Plans, "/api/1.0/plans")
 
 # Start flask listener
 if __name__ == "__main__":
-
-    # Create schedulers for background execution
-    scheduler = BackgroundScheduler()  
-    # Add scheduled task
-    # The scheduling method is timedTask, the trigger selects interval, and the interval length is 2 seconds
-    scheduler.add_job(timedTask, 'interval', seconds=2)
-    # Start scheduling task
-    scheduler.start()
+    sched = BlockingScheduler()
+    sched.add_job(my_job, 'date', run_date=datetime(2022, 5, 11, 19, 38, 0), args=['text'])
+    sched.start()
 
     servers_get_all()
     logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
