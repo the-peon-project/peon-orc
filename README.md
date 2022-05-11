@@ -150,4 +150,4 @@ http://peon.za.cloudlet.cloud:5000/api/1.0/servers [POST]
 This is an open source project and I am doing it, in my spare time, for fun.\
 However, if you really wish to say thank you, feel free to pick up a virtual coffee for me at Ko-fi.
 
-[Ko-fi](https://ko-fi.com/umlatt47309)
+[Buy me a coffee at Ko-fi](https://ko-fi.com/umlatt47309)
