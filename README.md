@@ -113,13 +113,19 @@ url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
 
 ###### Example [Valhiem Server]
 
-REST URL - ``POST``
+URL [REST] - ``POST``
 
 ```url
 http://peon.za.cloudlet.cloud:5000/api/1.0/servers [POST]
 ```
 
-Payload - ``JSON``
+HEADERS
+
+```json
+{ "X-Api-Key" : "my-super-secret-api-key" }
+```
+
+Payload [BODY] - ``JSON``
 
 ```json
 {
