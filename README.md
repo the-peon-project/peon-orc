@@ -111,9 +111,15 @@ url: {{peon_orchestrator_url}}:{{api_port}}/api/1.0/
 
 ##### Create server
 
+###### Example [Valhiem Server]
+
+REST URL - ``POST``
+
 ```url
 http://peon.za.cloudlet.cloud:5000/api/1.0/servers [POST]
 ```
+
+Payload - ``JSON``
 
 ```json
 {
@@ -128,18 +134,6 @@ http://peon.za.cloudlet.cloud:5000/api/1.0/servers [POST]
                 "WORLDNAME": "awesomeworld",
                 "PASSWORD": "password123"
             }
-        },
-        {
-            "type": "json",
-            "name": "config.json",
-            "content": {
-                "somekey": "somevalue"
-            }
-        },
-        {
-            "type": "txt",
-            "name": "textfile.txt",
-            "content": "Some random text. With a \ttabspace & and a \nnewline."
         }
     ]
 }
