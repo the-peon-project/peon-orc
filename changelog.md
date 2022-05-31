@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.10-dev
+
+- Logging - Added devMode switch
+
 ## 0.2.9-dev
 
 - UI - Added MOTD to container login
