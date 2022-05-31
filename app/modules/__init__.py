@@ -12,7 +12,7 @@ prefix = "peon.warcamp."
 
 def devMode():
     if os.path.isdir(f"{project_path}/dev"):
-        logging.info("DEV MODE ENABLED")
+        logging.warn("DEV MODE ENABLED")
         return True
     else:
         return False
