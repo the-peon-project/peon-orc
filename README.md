@@ -34,40 +34,40 @@ Check [changelog](https://github.com/nox-noctua-consulting/peon-orc/blob/master/
 
 - Non existent recipies work unexpectedly!??!
 
-### Architecture/Rules
+## Architecture/Rules
 
 Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
-### Feature Plan
+## Feature Plan
 
-#### *sprint 0.1.0*
+### *sprint 0.1.0*
 
 - [x] RESTapi (v1)
 - [x] Server deployment (v1)
 
-#### *sprint 0.2.0*
+### *sprint 0.2.0*
 
 - [x] RESTapi (v1) - custom configurations
 - [x] Server deployment (v2) - custom configurations
 - [x] Persistent server data - Keep server data for updates & future releases.
 
-#### *sprint 0.3.0*
+### *sprint 0.3.0*
 
 - [x] RESTapi (v1) - Plan/recipies
 - [x] Security - api-key integration
 - [ ] Backups
 - [ ] Start/Stop scheduler
   
-#### *sprint 0.4.0*
+### *sprint 0.4.0*
 
 - [ ] RESTapi (v1) - Console
 - [ ] Security - Users & Audit Loggin
 
-#### Notes
+### Notes
 
 [HTML Response Codes](https://www.restapitutorial.com/httpstatuscodes.html)
 
-#### API
+### API
 
 RESTful API
 
