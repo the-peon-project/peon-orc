@@ -104,7 +104,6 @@ class Server(Resource):
             servers_get_all()
             note = "Server {0} was removed."
         args = self.reqparse.parse_args()
-        print(args)
         if "eradicate" in args:
             if args["eradicate"] == "True":
                 server_delete_files(server_uid)
