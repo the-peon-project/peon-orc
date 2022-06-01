@@ -155,6 +155,8 @@ def server_create(server_uid, description, settings=[]):
         server_path)] = container_config["volumes"]["log_path"].copy()
     del container_config["volumes"]["log_path"]
     # STEP 4 - Process settings
+    # SET REQUIRED SETTINGS
+    container_config["variables"]["PUBLIC_IP"] = execute_shell("dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
     for setting in settings:
         if 'env' in setting["type"]:
             container_config["variables"] = add_envs(
@@ -185,8 +187,6 @@ def server_create(server_uid, description, settings=[]):
         )
         # STEP 6: Run server scripts to deploy container
         logging.debug("Executing commands in container")
-        logging.debug(container.exec_run("/usr/bin/apt update", user='root', privileged=True))
-        container.exec_run("/usr/bin/apt install -y dnsutils", user='root', privileged=True, detach=True, tty=True)
         logging.debug(" {0}".format(server_config["commands"]))
         for shell_command in server_config["commands"]:
             container.exec_run(
