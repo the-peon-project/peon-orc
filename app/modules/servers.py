@@ -5,6 +5,7 @@ import json
 from modules import client, servers, prefix
 from .shell import execute_shell
 from .plans import *
+from pathlib import Path
 
 root_path = "/root/peon"
 server_root_path = "{0}/servers".format(root_path)
@@ -30,8 +31,15 @@ def server_get_server(server):
         if server.status == "running":
             with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
                 server_state = f.read()
+            filepath = Path('{0}/{1}/{2}/config/server.config'.format(server_root_path, server_full_uid[2], server_full_uid[3]))
+            if filepath.is_file():
+                with open(filepath, 'r') as f:
+                    server_config = f.read()
+            else:
+                server_config = "UNAVAILABLE"
         else:
             server_state = "UNKNOWN"
+            server_config = "UNKNOWN"
     except:
         description = "None - Please add a description"
     server = {
@@ -39,6 +47,7 @@ def server_get_server(server):
         'servername': server_full_uid[3],
         'container_state': server.status,
         'server_state': server_state,
+        'server_config' : server_config,
         'description': description
     }
     return server

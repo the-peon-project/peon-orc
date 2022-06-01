@@ -15,6 +15,7 @@ serverFields = {
     "servername": fields.String,
     "container_state": fields.String,
     "server_state": fields.String,
+    "server_config" : fields.String,
     "description": fields.String
 }
 
@@ -31,8 +32,7 @@ class Server(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("game_uid", type=str, location="json")
         self.reqparse.add_argument("servername", type=str, location="json")
-        self.reqparse.add_argument(
-            "container_state", type=str, location="json")
+        self.reqparse.add_argument("container_state", type=str, location="json")
         self.reqparse.add_argument("server_state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
         self.reqparse.add_argument("eradicate", type=str, location="json")
