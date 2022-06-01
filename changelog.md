@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.11-dev
+
+- PUBLIC_IP - added to container variables
+
 ## 0.2.10-dev
 
 - Logging - Added devMode switch
