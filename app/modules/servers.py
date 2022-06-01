@@ -185,6 +185,8 @@ def server_create(server_uid, description, settings=[]):
         )
         # STEP 6: Run server scripts to deploy container
         logging.debug("Executing commands in container")
+        logging.debug(container.exec_run("/usr/bin/apt update", user='root', privileged=True))
+        container.exec_run("/usr/bin/apt install -y dnsutils", user='root', privileged=True, detach=True, tty=True)
         logging.debug(" {0}".format(server_config["commands"]))
         for shell_command in server_config["commands"]:
             container.exec_run(
@@ -196,7 +198,7 @@ def server_create(server_uid, description, settings=[]):
             container.remove()
         except:
             logging.warn(
-                "Failed container [{0}] was not removed.".format(container_name))
+                "Failed - container [{0}] was not removed.".format(container_name))
     return error
 
 
