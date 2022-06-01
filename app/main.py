@@ -2,6 +2,7 @@
 import logging
 from flask import Flask
 from flask_restful import Api
+import time
 # Import Peon Modules
 from modules.api_v1 import *
 from modules.servers import *
@@ -25,7 +26,18 @@ api_v1.add_resource(Plans, "/api/1.0/plans")
 # Start flask listener
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    # Check for DEV mode (contents of the /dev dir are ignored by the docker build, but can be used in development)
     devMode()
+    # Verify that the orchestrator has access to the underlying host
+    authorized="NOK"
+    while authorized != 'OK':
+        try:
+            authorized=execute_shell("ssh 172.20.0.1 -p 22222 echo 'OK'")[0]
+        except:
+            logging.error("############################## Orchestrator not authorised!!! ##############################")
+            time.sleep(5)
+    # load all registered servers into memory
     servers_get_all()
+    # Start Orchestrator services
     logging.debug(app.run(host="0.0.0.0", port=5000, debug=True))
     
