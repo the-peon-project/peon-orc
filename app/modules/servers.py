@@ -164,6 +164,11 @@ def server_create(server_uid, description, settings=[]):
         server_path)] = container_config["volumes"]["log_path"].copy()
     del container_config["volumes"]["log_path"]
     # STEP 4 - Process settings
+    # CLEAN OLD SETTINGS
+    server_config_file = f"{server_path}/config/server.config"
+    if (Path(server_config_file)).is_file():
+        with open(server_config_file, 'w') as f:
+            f.write('Services starting...')
     # SET REQUIRED SETTINGS
     container_config["variables"]["PUBLIC_IP"] = execute_shell("dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
     for setting in settings:
