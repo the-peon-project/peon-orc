@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.12-dev
+
+- API Response - Server config
+
 ## 0.2.11-dev
 
 - PUBLIC_IP - added to container variables
