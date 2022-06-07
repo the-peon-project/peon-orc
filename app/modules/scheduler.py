@@ -58,7 +58,6 @@ def add_delta(start_time,interval):
 def schedule_add_timeout_event(server_uid, interval, action="stop"):
     now = datetime.today()
     result = add_delta(now,interval)
-    print (result)
     if "response" in result:
         epoch_time = int(time.mktime(result["response"].timetuple()))
         return schedule_add_event(server_uid, epoch_time, action)
