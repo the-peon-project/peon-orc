@@ -4,6 +4,8 @@ import docker
 import logging
 
 project_path = "/".join(((os.path.dirname(__file__)).split("/"))[:-1])
+install_path = "/root/peon"
+schedule_file=f"{install_path}/servers/schedule.json"
 
 # Settings file
 settings = json.load(open(f"{project_path}/settings.json", 'r'))

@@ -18,8 +18,7 @@ serverFields = {
     "server_state": fields.String,
     "server_config" : fields.String,
     "description": fields.String,
-    "interval" : fields.String,
-    "epoch_time" : fields.String
+    "time": fields.String
 }
 
 planFields = {
@@ -66,6 +65,7 @@ class Server(Resource):
             "APIv1 - Server {0} - Action {1}".format(server_uid, action))
         result = "OK"
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
+        args=self.reqparse.parse_args()
         try:
             server = server_get_server(client.containers.get(
                 "{0}{1}".format(prefix, server_uid)))
@@ -74,10 +74,10 @@ class Server(Resource):
             return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
         if action == "start":
             server_start(server_uid)
-            result = scheduler_stop_request(server_uid,self.reqparse.parse_args())
+            result = scheduler_stop_request(server_uid,args)
         elif action == "stop":
             server_stop(server_uid)
-            result = scheduler_stop_request(server_uid,self.reqparse.parse_args())
+            result = scheduler_stop_request(server_uid,args)
         elif action == "restart":
             server_restart(server_uid)
         elif action == "description":
@@ -89,8 +89,7 @@ class Server(Resource):
         else:
             return {"error": "Unsupported action [{0}].".format(action)}, 404
         time.sleep(0.5)
-        server = server_get_server(client.containers.get(
-            "{0}{1}".format(prefix, server_uid)))
+        server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
         if "response" in result:
             return {"server": marshal(server, serverFields)}, 200
         else:

@@ -7,10 +7,10 @@ import json
 import re
 from datetime import datetime
 from dateutil.relativedelta import *
+from modules import schedule_file
 from modules.servers import server_start, server_stop, server_restart
 
 interval = 30 # Seconds
-schedule_file="/root/peon/servers/schedule.json"
 
 def schedule_read_from_disk():
     if (Path(schedule_file)).exists():
@@ -97,11 +97,11 @@ def scheduler_tick():
     threading.Timer(interval, scheduler_tick).start()
 
 def scheduler_stop_request(server_uid,args):
-    if "interval" in args:
+    if args["interval"] != None:
         result = schedule_add_timeout_event(server_uid,args["interval"])
         if "error" in result:
             return result
-    elif "epoch_time" in args:
+    elif args["epoch_time"] != None:
         result = schedule_add_event(server_uid,args["epoch_time"])
         if "error" in result:
             return result

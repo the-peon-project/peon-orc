@@ -2,10 +2,11 @@
 import logging
 import traceback
 import json
-from modules import client, servers, prefix
+from pathlib import Path
+from modules import client, servers, prefix, schedule_file
 from .shell import execute_shell
 from .plans import *
-from pathlib import Path
+#from .scheduler import schedule_read_from_disk
 
 root_path = "/root/peon"
 server_root_path = "{0}/servers".format(root_path)
@@ -22,33 +23,53 @@ def server_get_stats(server_uid):
     except:
         return "Not available"
 
+def schedule_read_from_disk():
+    if (Path(schedule_file)).exists():
+        with open(schedule_file, 'r') as f:
+            schedule = json.load(f)
+        return schedule
+    else:
+        return []
 
 def server_get_server(server):
     server_full_uid = (server.name).split('.')
     try:
         with open('{0}/{1}/{2}/description'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
             description = f.read()
+    except:
+        description = "None - Please add a description"
+    try:
         if server.status == "running":
             with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
                 server_state = f.read()
-            filepath = Path('{0}/{1}/{2}/config/server.config'.format(server_root_path, server_full_uid[2], server_full_uid[3]))
+            filepath = Path('{0}/{1}/{2}/config/server.config'.format(
+                server_root_path, server_full_uid[2], server_full_uid[3]))
             if filepath.is_file():
                 with open(filepath, 'r') as f:
                     server_config = f.read()
             else:
                 server_config = "UNAVAILABLE"
         else:
-            server_state = "UNKNOWN"
-            server_config = "UNKNOWN"
+            server_state = "OFFLINE"
+            server_config = "OFFLINE"
     except:
-        description = "None - Please add a description"
+        server_state = "UNKNOWN"
+        server_config = "UNKNOWN"
+    try:
+        epoch_time = None
+        for item in schedule_read_from_disk():
+            if item["server_uid"] == "{0}.{1}".format(server_full_uid[2], server_full_uid[3]):
+                epoch_time = item["time"]
+    except:
+        epoch_time = None
     server = {
         'game_uid': server_full_uid[2],
         'servername': server_full_uid[3],
         'container_state': server.status,
         'server_state': server_state,
-        'server_config' : server_config,
-        'description': description
+        'server_config': server_config,
+        'description': description,
+        'time': epoch_time
     }
     return server
 
@@ -99,7 +120,8 @@ def server_restart(server_uid):
 
 
 def server_delete_files(server_uid):
-    execute_shell("rm -rf {0}/{1}".format(server_root_path,str(server_uid).replace(".","/")))
+    execute_shell("rm -rf {0}/{1}".format(server_root_path, str(server_uid).replace(".", "/")))
+
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
@@ -170,17 +192,16 @@ def server_create(server_uid, description, settings=[]):
         with open(server_config_file, 'w') as f:
             f.write('Services starting...')
     # SET REQUIRED SETTINGS
-    container_config["variables"]["PUBLIC_IP"] = execute_shell("dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
+    container_config["variables"]["PUBLIC_IP"] = execute_shell(
+        "dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
     for setting in settings:
         if 'env' in setting["type"]:
             container_config["variables"] = add_envs(
                 container_config["variables"], setting["content"])
         elif 'json' in setting["type"]:
-            file_json("{0}/config/{1}".format(server_path,
-                      setting["name"]), setting["content"])
+            file_json("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
         elif 'txt' in setting["type"]:
-            file_txt("{0}/config/{1}".format(server_path,
-                     setting["name"]), setting["content"])
+            file_txt("{0}/config/{1}".format(server_path, setting["name"]), setting["content"])
     # Set all file/path ownership
     execute_shell("chown -R 1000:1000 {0}".format(server_path))
     # STEP 5 - Start container
