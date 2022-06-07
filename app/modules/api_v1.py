@@ -5,6 +5,7 @@ from modules import servers, settings, prefix
 from .servers import *
 from .plans import *
 from .security import *
+from .scheduler import *
 import logging
 import traceback
 import time
@@ -16,7 +17,9 @@ serverFields = {
     "container_state": fields.String,
     "server_state": fields.String,
     "server_config" : fields.String,
-    "description": fields.String
+    "description": fields.String,
+    "interval" : fields.String,
+    "epoch_time" : fields.String
 }
 
 planFields = {
@@ -36,6 +39,8 @@ class Server(Resource):
         self.reqparse.add_argument("server_state", type=str, location="json")
         self.reqparse.add_argument("description", type=str, location="json")
         self.reqparse.add_argument("eradicate", type=str, location="json")
+        self.reqparse.add_argument("interval", type=str, location="json")
+        self.reqparse.add_argument("epoch_time", type=str, location="json")
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
@@ -59,6 +64,7 @@ class Server(Resource):
     def put(self, action, server_uid):
         logging.info(
             "APIv1 - Server {0} - Action {1}".format(server_uid, action))
+        result = "OK"
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         try:
             server = server_get_server(client.containers.get(
@@ -68,8 +74,10 @@ class Server(Resource):
             return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
         if action == "start":
             server_start(server_uid)
+            result = scheduler_stop_request(server_uid,self.reqparse.parse_args())
         elif action == "stop":
             server_stop(server_uid)
+            result = scheduler_stop_request(server_uid,self.reqparse.parse_args())
         elif action == "restart":
             server_restart(server_uid)
         elif action == "description":
@@ -77,13 +85,16 @@ class Server(Resource):
                 server_update_description(
                     server, (self.reqparse.parse_args())["description"])
             except:
-                return {"error": "The description argument was incorrectly provided."}, 404
+                return {"error": "The description argument was incorrectly provided."}, 400
         else:
             return {"error": "Unsupported action [{0}].".format(action)}, 404
         time.sleep(0.5)
         server = server_get_server(client.containers.get(
             "{0}{1}".format(prefix, server_uid)))
-        return{"server": marshal(server, serverFields)}, 200
+        if "response" in result:
+            return {"server": marshal(server, serverFields)}, 200
+        else:
+            return result, 400
 
     # DELETE - Remove a server
     def delete(self, action, server_uid):

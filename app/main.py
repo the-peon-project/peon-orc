@@ -41,7 +41,7 @@ if __name__ == "__main__":
                 "############################## Orchestrator not authorised!!! ##############################")
             time.sleep(5)
     # Start the schedulers timer
-    schedular_tick()
+    scheduler_tick()
     # load all registered servers into memory
     servers_get_all()
     # Start Orchestrator services
