@@ -1,5 +1,9 @@
 # PEON ORC - Changelog
 
+## 0.2.13-dev
+
+- Scheduler - v1.0 - Added simple start & delayed stop in scheduler
+
 ## 0.2.12-dev
 
 - API Response - Server config
