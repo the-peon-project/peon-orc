@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # BUG: Double tick - change app.run(debug=True) to app.run(debug=False) in main.py
+import logging
 import time, threading
 from pathlib import Path
 import json
@@ -96,12 +97,24 @@ def scheduler_tick():
         schedule_write_to_disk(new_schedule)
     threading.Timer(interval, scheduler_tick).start()
 
+def scheduler_remove_exisiting_stop(server_uid):
+    schedules = schedule_read_from_disk()
+    new_schedule = []
+    for item in schedules:
+        if item["server_uid"] == server_uid and item["action"] == "stop":
+            logging.debug(f"Removing {item} from schedule.")
+        else:
+            new_schedule.append(item)
+    schedule_write_to_disk(new_schedule)
+
 def scheduler_stop_request(server_uid,args):
     if args["interval"] != None:
+        scheduler_remove_exisiting_stop(server_uid)
         result = schedule_add_timeout_event(server_uid,args["interval"])
         if "error" in result:
             return result
     elif args["epoch_time"] != None:
+        scheduler_remove_exisiting_stop(server_uid)
         result = schedule_add_event(server_uid,args["epoch_time"])
         if "error" in result:
             return result
