@@ -51,7 +51,7 @@ def server_get_server(server):
                 server_config = "UNAVAILABLE"
         else:
             server_state = "OFFLINE"
-            server_config = "OFFLINE"
+            server_config = "UNAVAILABLE"
     except:
         server_state = "UNKNOWN"
         server_config = "UNKNOWN"
