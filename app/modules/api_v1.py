@@ -73,11 +73,13 @@ class Server(Resource):
             logging.error(traceback.format_exc())
             return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
         if action == "start":
-            server_start(server_uid)
             result = scheduler_stop_request(server_uid,args)
+            if "response" in result:
+                server_start(server_uid)
         elif action == "stop":
-            server_stop(server_uid)
             result = scheduler_stop_request(server_uid,args)
+            if "response" in result:
+                server_stop(server_uid)
         elif action == "restart":
             server_restart(server_uid)
         elif action == "description":
