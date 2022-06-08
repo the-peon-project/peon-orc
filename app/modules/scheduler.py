@@ -108,16 +108,18 @@ def scheduler_remove_exisiting_stop(server_uid):
     schedule_write_to_disk(new_schedule)
 
 def scheduler_stop_request(server_uid,args):
-    if args["interval"] != None:
-        scheduler_remove_exisiting_stop(server_uid)
-        result = schedule_add_timeout_event(server_uid,args["interval"])
-        if "error" in result:
-            return result
-    elif args["epoch_time"] != None:
-        scheduler_remove_exisiting_stop(server_uid)
-        result = schedule_add_event(server_uid,args["epoch_time"])
-        if "error" in result:
-            return result
+    if "interval" in args:
+        if args["interval"] != None:
+            scheduler_remove_exisiting_stop(server_uid)
+            result = schedule_add_timeout_event(server_uid,args["interval"])
+            if "error" in result:
+                return result
+    if "epoch_time" in args:
+        if args["epoch_time"] != None:
+            scheduler_remove_exisiting_stop(server_uid)
+            result = schedule_add_event(server_uid,args["epoch_time"])
+            if "error" in result:
+                return result
     return { "response" : "OK" }
     
 if __name__ == "__main__":
