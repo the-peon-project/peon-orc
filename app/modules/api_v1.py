@@ -79,7 +79,8 @@ class Server(Resource):
         elif action == "stop":
             result = scheduler_stop_request(server_uid,args)
             if "response" in result:
-                server_stop(server_uid)
+                if result["response"] == "IMMEDIATE":
+                    server_stop(server_uid)
         elif action == "restart":
             server_restart(server_uid)
         elif action == "description":
