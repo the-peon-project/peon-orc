@@ -108,15 +108,14 @@ def scheduler_remove_exisiting_stop(server_uid):
     schedule_write_to_disk(new_schedule)
 
 def scheduler_stop_request(server_uid,args):
+    result = { "response" : "NOW" }
     if args["interval"] != None:
         scheduler_remove_exisiting_stop(server_uid)
         result = schedule_add_timeout_event(server_uid,args["interval"])
-        return result
     if args["epoch_time"] != None:
         scheduler_remove_exisiting_stop(server_uid)
         result = schedule_add_event(server_uid,args["epoch_time"])
-        return result
-    return { "response" : "IMMEDIATE" }
+    return result
     
 if __name__ == "__main__":
     output = schedule_add_timeout_event("vrising.countjugular", interval="2m", action="start")

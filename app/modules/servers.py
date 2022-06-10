@@ -92,6 +92,7 @@ def servers_get_all():
             game_servers.append(game_server)
     for server in game_servers:
         servers.append(server_get_server(server))
+    return {"response" : "OK"}
 
 
 def server_update_description(server, description):
@@ -99,35 +100,36 @@ def server_update_description(server, description):
         server['game_uid'], server['servername'], description))
     with open("{0}/servers/{1}/{2}/description".format(root_path, server['game_uid'], server['servername']), 'w') as f:
         f.write(description)
+    return {"response" : "OK"}
 
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.start()
-
+    return {"response" : "OK"}
 
 def server_stop(server_uid):
     logging.info("Stopping server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
-
+    return {"response" : "OK"}
 
 def server_restart(server_uid):
     logging.info("Restarting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.restart()
-
+    return {"response" : "OK"}
 
 def server_delete_files(server_uid):
     execute_shell("rm -rf {0}/{1}".format(server_root_path, str(server_uid).replace(".", "/")))
-
+    return {"response" : "OK"}
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.remove()
-
+    return {"response" : "OK"}
 
 def add_envs(env_vars, content):
     for key in content.keys():
@@ -147,7 +149,7 @@ def file_txt(path, content):
 
 def server_create(server_uid, description, settings=[]):
     # START
-    error = "none"
+    error = None
     plan_root_path = "{0}/plans".format(root_path)
     game_uid = server_uid.split('.')[0]
     server_name = server_uid.split('.')[1]
@@ -234,7 +236,10 @@ def server_create(server_uid, description, settings=[]):
         except:
             logging.warn(
                 "Failed - container [{0}] was not removed.".format(container_name))
-    return error
+    if error == None:
+        return {"response" : "OK"}
+    else:
+        return {"error" : error}
 
 
 # MAIN - for dev purposes
