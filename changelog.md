@@ -1,5 +1,7 @@
 # PEON ORC - Changelog
 
+- Bug Fixes - Scheduler vs Start/Stop
+
 ## 0.2.14-dev
 
 - Scheduler v1.0 - Bugfix (server stop is now properly scheduled)
