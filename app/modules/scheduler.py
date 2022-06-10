@@ -109,12 +109,14 @@ def scheduler_remove_exisiting_stop(server_uid):
 
 def scheduler_stop_request(server_uid,args):
     result = { "response" : "NOW" }
-    if args["interval"] != None:
-        scheduler_remove_exisiting_stop(server_uid)
-        result = schedule_add_timeout_event(server_uid,args["interval"])
-    if args["epoch_time"] != None:
-        scheduler_remove_exisiting_stop(server_uid)
-        result = schedule_add_event(server_uid,args["epoch_time"])
+    if "interval" in args:
+        if args["interval"] != None:
+            scheduler_remove_exisiting_stop(server_uid)
+            result = schedule_add_timeout_event(server_uid,args["interval"])
+    if "interval" in args:
+        if args["epoch_time"] != None:
+            scheduler_remove_exisiting_stop(server_uid)
+            result = schedule_add_event(server_uid,args["epoch_time"])
     return result
     
 if __name__ == "__main__":

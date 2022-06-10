@@ -63,9 +63,14 @@ class Server(Resource):
     def put(self, action, server_uid):
         logging.info(
             "APIv1 - Server {0} - Action {1}".format(server_uid, action))
-        result = "OK"
+        result = { "response" : "OK"}
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
-        args=self.reqparse.parse_args()
+        try:
+            args=self.reqparse.parse_args()
+        except:
+            #args= {'game_uid': None, 'servername': None, 'container_state': None, 'server_state': None, 'description': None, 'eradicate': None, 'interval': None, 'epoch_time': None}
+            args= {}
+            logging.debug("No arguments passed")
         try:
             server = server_get_server(client.containers.get(
                 "{0}{1}".format(prefix, server_uid)))
