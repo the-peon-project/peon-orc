@@ -1,5 +1,11 @@
 # PEON ORC - Changelog
 
+## 0.2.16-dev
+
+- Bug Fixes - Server create returned false error due to change error dict hanlder
+
+## 0.2.15-dev
+
 - Bug Fixes - Scheduler vs Start/Stop
 
 ## 0.2.14-dev
