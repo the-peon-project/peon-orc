@@ -168,19 +168,19 @@ class Servers(Resource):
                 args["settings"] = []
             get_latest_plans_list()
             download_shared_plans()  # Pull latest shared files
-            error = get_plan(args["game_uid"])
-            if error == "none":
-                error = server_create("{0}.{1}".format(
+            response = get_plan(args["game_uid"])
+            if "response" in response:
+                response = server_create("{0}.{1}".format(
                     args["game_uid"], args["servername"]),
                     args["description"],
                     args["settings"])
-            if error == "none":
+            if "response" in response:
                 servers.append(server)
                 time.sleep(0.5)
                 return server_get_server(client.containers.get(
                     "{0}{1}.{2}".format(prefix, args["game_uid"],args["servername"])))
             else:
-                return{"error": error}, 501
+                return response, 501
         except Exception as e:
             logging.error(traceback.format_exc())
             return {"error": "Something bad happened. Check the logs for details. Please submit to (@peon devs) to improve error handling."}, 500
