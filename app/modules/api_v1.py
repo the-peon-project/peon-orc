@@ -85,6 +85,7 @@ class Server(Resource):
             result = scheduler_stop_request(server_uid,args)
             if "response" in result:
                 if result["response"] == "NOW":
+                    scheduler_remove_exisiting_stop(server_uid)
                     result = server_stop(server_uid)
         elif action == "restart":
             server_restart(server_uid)
