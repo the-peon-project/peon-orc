@@ -1,5 +1,10 @@
 # PEON ORC - Changelog
 
+## 0.2.17-dev
+
+- Bug Fixes - Remove schedule on manual stop
+- Improvement - Validate epoch time input for scheduler epoch time
+
 ## 0.2.16-dev
 
 - Bug Fixes - Server create returned false error due to change error dict hanlder
