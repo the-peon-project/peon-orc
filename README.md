@@ -9,6 +9,10 @@ Art by [André Kent - Artstation](https://www.artstation.com/artwork/W2E0RQ)
 
 ## The Easy Game Server Manager
 
+### Installation
+
+> Please find the installation instructions at [PEON](https://github.com/nox-noctua-consulting/peon/) master project, as there are several dependencies that are required for this module to work correctly.
+
 ### [Peon Project](https://github.com/nox-noctua-consulting/peon)
 
 An **OpenSource** project to assist gamers in self-deploying/managing game servers.\
@@ -35,7 +39,7 @@ Check [changelog](https://github.com/nox-noctua-consulting/peon-orc/blob/master/
 
 ### Known Bugs
 
-- Non existent recipies work unexpectedly!??!
+- ?
 
 ## Architecture/Rules
 
@@ -58,8 +62,8 @@ Orchestrator (PeonOrc) built as a docker image for easy deployment.
 
 - [x] RESTapi (v1) - Plan/recipies
 - [x] Security - api-key integration
+- [x] Start/Stop scheduler
 - [ ] Backups
-- [ ] Start/Stop scheduler
   
 ### *sprint 0.4.0*
 
