@@ -28,6 +28,7 @@ api_v1.add_resource(Plans, "/api/1.0/plans")
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a',
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    logging.debug("[START]")
     # Check for DEV mode (contents of the /dev dir are ignored by the docker build, but can be used in development)
     devMode()
     # Verify that the orchestrator has access to the underlying host
@@ -45,3 +46,4 @@ if __name__ == "__main__":
     servers_get_all()
     # Start Orchestrator services
     logging.debug(app.run(host="0.0.0.0", port=5000, debug=False)) # Setting DEBUG=true will make timer trigger x2
+    logging.debug("[END]")
