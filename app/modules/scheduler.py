@@ -109,17 +109,15 @@ def scheduler_remove_exisiting_stop(server_uid):
 
 def scheduler_stop_request(server_uid,args):
     result = { "response" : "NOW" }
-    if "interval" in args:
-        if args["interval"] != None:
+    if "interval" in args and args["interval"] != None:
+        scheduler_remove_exisiting_stop(server_uid)
+        result = schedule_add_timeout_event(server_uid,args["interval"])
+    if "epoch_time" in args and args["epoch_time"] != None:
+        if re.search("^[0-9]{10}$", args["epoch_time"]): # Check that it appears to be a valid Epoch number
             scheduler_remove_exisiting_stop(server_uid)
-            result = schedule_add_timeout_event(server_uid,args["interval"])
-    if "epoch_time" in args:
-        if args["epoch_time"] != None:
-            if re.search("^[0-9]{10}$", args["epoch_time"]): # Check that it appears to be a valid Epoch number
-                scheduler_remove_exisiting_stop(server_uid)
-                result = schedule_add_event(server_uid,args["epoch_time"])
-            else:
-                result = { "error" : "Non-epoch time value provided for scheduler" }
+            result = schedule_add_event(server_uid,args["epoch_time"])
+        else:
+            result = { "error" : "Non-epoch time value provided for scheduler" }
     return result
     
 if __name__ == "__main__":

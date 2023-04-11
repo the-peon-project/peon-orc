@@ -76,17 +76,16 @@ class Server(Resource):
                 "{0}{1}".format(prefix, server_uid)))
         except Exception as e:
             logging.error(traceback.format_exc())
-            return {"error": "The server [0] is inaccessible. Is the name valid?".format(server_uid)}, 404
+            return {"error": "The server [{0}] is inaccessible. Is the name valid?".format(server_uid)}, 404
         if action == "start":
             result = scheduler_stop_request(server_uid,args)
             if "response" in result:
                 result = server_start(server_uid)
         elif action == "stop":
             result = scheduler_stop_request(server_uid,args)
-            if "response" in result:
-                if result["response"] == "NOW":
-                    scheduler_remove_exisiting_stop(server_uid)
-                    result = server_stop(server_uid)
+            if "response" in result and result["response"] == "NOW":
+                scheduler_remove_exisiting_stop(server_uid)
+                result = server_stop(server_uid)
         elif action == "restart":
             server_restart(server_uid)
         elif action == "description":
@@ -123,10 +122,9 @@ class Server(Resource):
             servers_get_all()
             note = "Server {0} was removed."
         args = self.reqparse.parse_args()
-        if "eradicate" in args:
-            if args["eradicate"] == "True":
-                server_delete_files(server_uid)
-                note = note + "All files for {0} have been removed."
+        if "eradicate" in args and args["eradicate"] == "True":
+            server_delete_files(server_uid)
+            note = note + "All files for {0} have been removed."
         return {"success": note.format(server_uid)}, 200
 
 

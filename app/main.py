@@ -30,7 +30,7 @@ if __name__ == "__main__":
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     logging.debug("[START]")
     # Check for DEV mode (contents of the /dev dir are ignored by the docker build, but can be used in development)
-    devMode()
+    dev_mode()
     # Verify that the orchestrator has access to the underlying host
     authorized = "NOK"
     while authorized != 'OK':
