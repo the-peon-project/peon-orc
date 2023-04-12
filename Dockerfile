@@ -1,25 +1,26 @@
-# Base image debian bullseye slim
+# BASE: Base image - Python (Debian + slim)
 FROM python:3.11-slim-bullseye
-# Build information
+# CONTAINER: Configuration
 LABEL "com.peon.description"="Peon Orchestrator"
 LABEL "maintainer"="Umlatt <richard@noxnoctua.com>"
-# Copy "branding" stuff
+# BRANDING: Copy branding into container
 COPY ./media/banner /etc/motd
 RUN echo "cat /etc/motd" >> /etc/bash.bashrc
-# Install python requirements
+# OS: Prepare the OS and middleware
+RUN apt-get update
+# DOCKER
+RUN apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
+# PYTHON
 COPY ./requirements.txt /app/requirements.txt
-# Update pip and install required python modules
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
-# Install required tools
-RUN apt-get update && apt-get -y install ssh
-# TEMP: Install debug tools
-RUN apt-get update && apt-get -y install procps iputils-ping dnsutils vim
-# Set docker host IP
-ENV DOCKER_HOST ssh://172.20.0.1:22222
-# Start the app called api
+# DEBUG: Install tools for debugging
+RUN apt-get -y install procps iputils-ping dnsutils vim
+# APPLICATION
 COPY ./app /app
-# Move to working directory
 WORKDIR /app
 # Start application
 CMD ["/bin/sh", "-c","python3 main.py >> /var/log/peon/orc.log 2>&1"]
