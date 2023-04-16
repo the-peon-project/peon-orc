@@ -33,7 +33,7 @@ def plans_get_current():
 
 def download_shared_plans():
     logging.debug("Downloading shared plans".format())
-    url = "https://github.com/the-peon-project/peon-warplans/archive/master.tar.gz"
+    url = "https://github.com/the-peon-project/peon-wartable/archive/master.tar.gz"
     urllib.request.urlretrieve(
         url, "{0}/master.tar.gz".format(plan_path))
     execute_shell('''
