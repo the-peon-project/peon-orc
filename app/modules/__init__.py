@@ -11,14 +11,6 @@ schedule_file=f"{install_path}/servers/schedule.json"
 settings = json.load(open(f"{project_path}/settings.json", 'r'))
 # Container prefix
 prefix = "peon.warcamp."
-
-def dev_mode():
-    if os.path.isdir(f"{project_path}/dev"):
-        logging.warn("DEV MODE ENABLED")
-        return True
-    else:
-        return False
-
 # Server list
 global servers
 servers = []
