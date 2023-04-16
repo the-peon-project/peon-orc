@@ -22,5 +22,10 @@ RUN apt-get -y install procps iputils-ping dnsutils vim
 # APPLICATION
 COPY ./app /app
 WORKDIR /app
+# VERSION
+ARG VERSION
+ENV VERSION=${VERSION}
+RUN echo VERSION=${VERSION} >> /etc/environment
 # Start application
-CMD ["/bin/sh", "-c","python3 main.py >> /var/log/peon/orc.log 2>&1"]
+COPY ./init /init
+CMD ["/bin/bash","/init/peon.orc"]
