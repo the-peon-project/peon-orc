@@ -1,8 +1,8 @@
 import logging
-
-api_key = "my-super-secret-api-key"
+from . import settings
 
 def authorized(headers):
+    api_key = settings['api']['key']
     auth = headers.get("X-Api-Key")
     if auth == api_key:
         return True
