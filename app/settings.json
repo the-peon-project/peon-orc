@@ -1,9 +1,5 @@
 {
-    "peon.db" : {
-        "ip" : "172.20.0.2",
-        "port" : "5432",
-        "db" : "durotar",
-        "user" : "gromhellscream",
-        "password" : "Zu88Zu88"
+    "api" : {
+        "key" : "Zu88Zu88"
     }
 }
