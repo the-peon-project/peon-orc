@@ -27,7 +27,7 @@ def plans_get_current():
         try:
             get_latest_plans_list()
             return json.load(open(plan_file_path))
-        except Exception as e:
+        except Exception:
             logging.error(traceback.format_exc())
             return {"error":"Could not get latest plans."}
 
