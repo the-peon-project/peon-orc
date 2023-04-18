@@ -194,8 +194,8 @@ def server_create(server_uid, description, settings=[]):
         with open(server_config_file, 'w') as f:
             f.write('Services starting...')
     # SET REQUIRED SETTINGS
-    container_config["variables"]["PUBLIC_IP"] = execute_shell(
-        "dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
+    #container_config["variables"]["PUBLIC_IP"] = execute_shell(
+    #    "dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | tr -d '\"'")[0]
     for setting in settings:
         if 'env' in setting["type"]:
             container_config["variables"] = add_envs(
