@@ -234,8 +234,7 @@ def server_create(server_uid, description, settings=[]):
         try:
             container.remove()
         except:
-            logging.warn(
-                "Failed - container [{0}] was not removed.".format(container_name))
+            logging.warn(f"Failed - container [{container_name}] was not removed. {e}")
     if error == None:
         return {"response" : "OK"}
     else:
