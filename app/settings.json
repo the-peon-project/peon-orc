@@ -1,5 +1,11 @@
 {
-    "api" : {
-        "key" : "Zu88Zu88"
+    "api": {
+        "key": "Zu88Zu88"
+    },
+    "path": {
+        "servers": "/root/peon/servers",
+        "plans": "/root/peon/plans",
+        "backups": "/root/peon/backups",
+        "logs": "/root/peon/logs"
     }
 }
