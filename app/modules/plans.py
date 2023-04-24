@@ -1,17 +1,29 @@
 #!/usr/bin/python3
 import logging
-import traceback
 import json
-from pathlib import Path
-import urllib.request
-from .shell import execute_shell
-from . import get_newest_version
+import requests
+import sys
+sys.path.insert(0,'/app')
+from modules import get_newest_version
+from modules.github import *
 
-def download_latest_plans_from_repository(): # On start (if empty) & on request
-    pass
+config = json.load(open("/app/config.json", 'r'))
 
-def get_remote_plan_version(game_uid): # https://raw.githubusercontent.com/the-peon-project/peon-warplans/main/valhiem/plan.json
-    pass
+def download_latest_plans_from_repository(repo='github'): # On start (if empty) & on request
+    if "github" in repo:
+        return update_plans_from_github()
+    else:
+        return { "status" : "error", "info" : f"The repository [{repo}] is not yet supported." }
+
+
+def get_remote_plan_version(game_uid):
+    game_plan_url = config['settings']['plan_url'].format(game_uid)
+    if (response := requests.get(game_plan_url)).status_code == 200:
+        try:
+            return (json.loads(response.content))['metadata']['version']
+        except Exception as e:
+            logging.warn(f"[get_remote_plan_version] Plan definition for [{game_uid}] not found at [game_plan_url].")
+    return None
 
 def get_local_plan_version(game_uid): # /home/peon/plans/{game_uid}
     pass
@@ -42,6 +54,12 @@ def prepare_warcamp(user_settings,ignore_remote_plans=False):
     if "success" not in (result := consolidate_user_settings_with_config(server_path=server_path,user_settings=user_settings))['status']: return result
     if "success" not in (result := generate_build_file(server_path=server_path,server_settings=result))['status']: return result
     return configure_permissions(server_path=server_path)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    logging.critical(get_remote_plan_version(game_uid='csgo'))
+
 
 # root_path = "/root/peon"
 # plan_path = "{0}/plans".format(root_path)
