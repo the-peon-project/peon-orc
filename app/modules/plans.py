@@ -7,8 +7,9 @@ import shutil
 import os
 sys.path.insert(0,'/app')
 from modules.github import *
+from modules.peon import get_warcamp_name
 
-config = json.load(open("/app/config.json", 'r'))
+
 
 # SPECIAL FUNCTIONS
 def identify_newest_version(version_local, version_remote):
@@ -66,32 +67,26 @@ def get_local_plan_definition(file_path):
         logging.warn(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
     return None
 
-def get_required_settings(game_uid):
+def get_required_settings(game_uid,config):
     if (plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")):
-        required_keys = [key for key, value in plan['metadata'].items() if value is None]
-        required_keys.extend([key for key, value in plan['environment'].items() if value is None])
-        return required_keys
+        return ([key for key, value in plan['environment'].items() if value is None])
     else:
         return None
 
 def consolidate_settings(user_settings,plan): # Check exisiting config and update new config accordingly. If there is an unknown entity, throw an error.
     # CHECK FOR REQUIRED VALUES
-
-    provided_keys = list(user_settings.keys())
+    provided_settings = list(user_settings.keys())
+    required_settings = get_required_settings(plan['metadata']['game_uid'],config)
+    if not any(setting in provided_settings for setting in required_settings): return { "status" : "error", "info" : f"Not all required server settings were provided. Namely: {required_settings}" }
     # METADATA
-    
-    # PORTS
-    
+    if "description" in user_settings: plan['metadata']["description"] = user_settings["description"]
+    plan['metadata']["warcamp"] = user_settings["warcamp"]
+    plan['metadata']['hostname']+=f".{user_settings['warcamp']}"
+    plan['metadata']['container_name']=plan['metadata']['hostname']
     # ENVIRONMENT VARIABLES
-    
-    # MOUNTS
-    
-    
-    # CHECK FOR 'NONE'
-    
-    plan['server_name'] = user_settings
-    
-    
+    for key in plan['environment']:
+        if key in user_settings and key not in ['STEAM_ID']:
+            plan['environment'][key] = user_settings[key]
     return { "status" : "success", "plan" : plan}
 
 def generate_build_file(config): # Take a config and create a docker-compose.yml file
@@ -101,13 +96,14 @@ def configure_permissions(server_path): # chown & chmod on path
     logging.critical("[consolidate_settings] TODO !!!!") # TODO
 
 # WARCAMP FUNCTIONS
-def create_warcamp(user_settings):
+def create_warcamp(user_settings,config):
     game_uid=user_settings["game_uid"]
-    server_name=user_settings["server_name"]
-    server_path=f"{config['path']['server']}/{game_uid}/{server_name}"
+    if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
+    warcamp=user_settings["warcamp"]
+    server_path=f"{config['path']['servers']}/{game_uid}/{warcamp}"
     # Check if there is already a plan in that directory
     try: 
-        if (get_local_plan_definition(f"{server_path}/docker-compose.yml")): return { "status" : "error" , "info" : f"There is already a config for [{game_uid}] [{server_name}]. Please run update on the game/server instead. (Can be added in a future release.)" }
+        if (get_local_plan_definition(f"{server_path}/docker-compose.yml")): return { "status" : "error" , "info" : f"There is already a config for [{game_uid}] [{warcamp}]. Please run update on the game/server instead. (Can be added in a future release.)" }
     except:
         logging.debug("[create_warcamp] No pre-existing config found.")
     # Get default plan definition
@@ -116,32 +112,42 @@ def create_warcamp(user_settings):
     if not os.path.exists(server_path):
         os.makedirs(server_path, exist_ok=True)
     # Configure default settings and save plan as default
-    default_plan['server_name'] = server_name
+    if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
+    
+    default_plan['warcamp'] = user_settings['warcamp']
     with open(f'{server_path}/plan.json', 'w') as f:
         json.dump(default_plan, f)
-    if "success" not in (config := consolidate_settings(user_settings=user_settings,plan=default_plan))['result']: return result
+    if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result
     with open(f'{server_path}/config.json', 'w') as f:
-        json.dump(config['plan'], f)
-    if "success" not in (result := generate_build_file(config['plan']))['status']: return result
+        json.dump(result['plan'], f)
+    if "success" not in (result := generate_build_file(result['plan']))['status']: return result
     return configure_permissions(server_path=server_path)
 
-def update_warcamp(game_uid,server_name):
+def update_warcamp(game_uid,warcamp):
     # Update config where possible (return highlighted change if something is missing)
     pass
 
-def get_warcamp_config(game_uid,server_name):
-    pass #modified_plan = get_local_plan_version(f"{config['path']['plans']}/{game_uid}/{server_name}/settings.json")
+def get_warcamp_config(game_uid,warcamp):
+    pass #modified_plan = get_local_plan_version(f"{config['path']['plans']}/{game_uid}/{warcamp}/settings.json")
 
 def modify_warcamp_config(user_settings):
     # game_uid = user_settings['game_uid']
-    # server_name = user_settings['server_name']
+    # warcamp = user_settings['warcamp']
     # # Get default config
     # default_plan = get_local_plan_version(f"{config['path']['plans']}/{game_uid}/plan.json")
-    # modified_plan = get_local_plan_version(f"{config['path']['plans']}/{game_uid}/{server_name}/settings.json")
+    # modified_plan = get_local_plan_version(f"{config['path']['plans']}/{game_uid}/{warcamp}/settings.json")
     pass
 
 # MAIN - DEV TEST
 
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
-    get_required_settings('vrising')
+    config = json.load(open("/app/config.json", 'r'))
+    user_settings={
+        "game_uid"    : "vrising",
+        "description" : "A V Rising server",
+        "SERVER_NAME" : "countjugular",
+        "WORLD_NAME"  : "townsville",
+        "PASSWORD"    : "Zu88Zu88"
+    }
+    print(create_warcamp(user_settings,config))
