@@ -1,7 +1,9 @@
 import logging
 from git import Repo
 import os
-from .shell import execute_shell
+import sys
+sys.path.insert(0,'/app')
+from modules.shell import execute_shell
 
 plan_path = '/home/peon/plans'
 repo_url = 'https://github.com/the-peon-project/peon-warplans.git'
@@ -37,8 +39,5 @@ def update_plans_from_github(force=False):
         return { "status" : "error", "info" : f"{e}" }    
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_github.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     update_plans_from_github()
-    
-    
-    
