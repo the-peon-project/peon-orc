@@ -66,8 +66,32 @@ def get_local_plan_definition(file_path):
         logging.warn(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
     return None
 
+def get_required_settings(game_uid):
+    if (plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")):
+        required_keys = [key for key, value in plan['metadata'].items() if value is None]
+        required_keys.extend([key for key, value in plan['environment'].items() if value is None])
+        return required_keys
+    else:
+        return None
+
 def consolidate_settings(user_settings,plan): # Check exisiting config and update new config accordingly. If there is an unknown entity, throw an error.
-    logging.critical("[consolidate_settings] TODO !!!!") # TODO
+    # CHECK FOR REQUIRED VALUES
+
+    provided_keys = list(user_settings.keys())
+    # METADATA
+    
+    # PORTS
+    
+    # ENVIRONMENT VARIABLES
+    
+    # MOUNTS
+    
+    
+    # CHECK FOR 'NONE'
+    
+    plan['server_name'] = user_settings
+    
+    
     return { "status" : "success", "plan" : plan}
 
 def generate_build_file(config): # Take a config and create a docker-compose.yml file
@@ -76,8 +100,7 @@ def generate_build_file(config): # Take a config and create a docker-compose.yml
 def configure_permissions(server_path): # chown & chmod on path
     logging.critical("[consolidate_settings] TODO !!!!") # TODO
 
-# WARCAMLP FUNCTIONS
-
+# WARCAMP FUNCTIONS
 def create_warcamp(user_settings):
     game_uid=user_settings["game_uid"]
     server_name=user_settings["server_name"]
@@ -103,7 +126,6 @@ def create_warcamp(user_settings):
     return configure_permissions(server_path=server_path)
 
 def update_warcamp(game_uid,server_name):
-    # Copy plan from /plans over default
     # Update config where possible (return highlighted change if something is missing)
     pass
 
@@ -122,4 +144,4 @@ def modify_warcamp_config(user_settings):
 
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
-    logging.critical(update_latest_plans_from_repository())
+    get_required_settings('vrising')
