@@ -4,17 +4,37 @@ import json
 import requests
 import sys
 sys.path.insert(0,'/app')
-from modules import get_newest_version
 from modules.github import *
 
 config = json.load(open("/app/config.json", 'r'))
+
+def identify_newest_version(version_local, version_remote):
+    # split the version strings into their components
+    version_local_components = [int(c) for c in version_local.split('.')]
+    version_remote_components = [int(c) for c in version_remote.split('.')]
+    # compare the major version component
+    if version_local_components[0] < version_remote_components[0]:
+        return "remote"
+    elif version_local_components[0] > version_remote_components[0]:
+        return "local"
+    # compare the minor version component
+    if version_local_components[1] < version_remote_components[1]:
+        return "remote"
+    elif version_local_components[1] > version_remote_components[1]:
+        return "local"
+    # compare the patch version component
+    if version_local_components[2] < version_remote_components[2]:
+        return "remote"
+    elif version_local_components[2] > version_remote_components[2]:
+        return "local"
+    # the versions are equal
+    return "same"
 
 def download_latest_plans_from_repository(repo='github'): # On start (if empty) & on request
     if "github" in repo:
         return update_plans_from_github()
     else:
         return { "status" : "error", "info" : f"The repository [{repo}] is not yet supported." }
-
 
 def get_remote_plan_version(game_uid):
     game_plan_url = config['settings']['plan_url'].format(game_uid)
@@ -47,7 +67,7 @@ def prepare_warcamp(user_settings,ignore_remote_plans=False):
         else: version_local = '0.0.0'
     if not ignore_remote_plans:
         version_remote = get_remote_plan_version(game_uid)
-        if 'remote' in get_newest_version(version_local,version_remote) or '0.0.0' in version_remote:
+        if 'remote' in identify_newest_version(version_local,version_remote) or '0.0.0' in version_remote:
             download_latest_plans_from_repository()
     server_path = f"/home/peon/servers/{game_uid}/{user_settings['server_name']}"
     if "success" not in (result := copy_default_plan_to_server_path(game_uid=game_uid,server_path=server_path))['status']: return result
@@ -58,7 +78,7 @@ def prepare_warcamp(user_settings,ignore_remote_plans=False):
 
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
-    logging.critical(get_remote_plan_version(game_uid='csgo'))
+    logging.critical(get_remote_plan_version(game_uid='csgo2'))
 
 
 # root_path = "/root/peon"
