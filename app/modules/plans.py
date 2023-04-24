@@ -92,7 +92,7 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
 def generate_build_file(server_path,config): # Take a config and create a docker-compose.yml file
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as file:
-            yaml.dump(config,file)
+            yaml.dump(config,file, sort_keys=False, indent=4)
         return { "status" : "success" }
     except Exception as e:
         return { "status" : "error", "info" : f"Could not create the `docker-compose.yml` file. {e}" }
@@ -122,10 +122,10 @@ def create_warcamp(user_settings,config):
     
     default_plan['warcamp'] = user_settings['warcamp']
     with open(f'{server_path}/plan.json', 'w') as f:
-        json.dump(default_plan, f)
+        json.dump(default_plan, f, indent=4)
     if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result
     with open(f'{server_path}/config.json', 'w') as f:
-        json.dump(result['plan'], f)
+        json.dump(result['plan'], f, indent=4)
     if "success" not in (result := generate_build_file(server_path=server_path,config=result['plan']))['status']: return result
     return configure_permissions(server_path=server_path)
 
