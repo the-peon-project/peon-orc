@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 import logging
 import json
+import yaml
 import requests
 import sys
-import shutil
 import os
 sys.path.insert(0,'/app')
 from modules.github import *
@@ -53,7 +53,7 @@ def get_remote_plan_version(game_uid):
         if (response := requests.get(game_plan_url)).status_code == 200:
             return (json.loads(response.content))['metadata']['version']
     except Exception as e:
-            logging.warn(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
+            logging.warning(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
     return None
 
 # LOCAL PLAN FUNCTIONS
@@ -64,7 +64,7 @@ def get_local_plan_definition(file_path):
                 game_plan = json.load(json_file)    
         return game_plan
     except Exception as e:
-        logging.warn(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
+        logging.warning(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
     return None
 
 def get_required_settings(game_uid,config):
@@ -89,8 +89,14 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
             plan['environment'][key] = user_settings[key]
     return { "status" : "success", "plan" : plan}
 
-def generate_build_file(config): # Take a config and create a docker-compose.yml file
-    logging.critical("[consolidate_settings] TODO !!!!") # TODO
+def generate_build_file(server_path,config): # Take a config and create a docker-compose.yml file
+    try:
+        with open(f"{server_path}/docker-compose.yml", "w") as file:
+            yaml.dump(config,file)
+        return { "status" : "success" }
+    except Exception as e:
+        return { "status" : "error", "info" : f"Could not create the `docker-compose.yml` file. {e}" }
+        
 
 def configure_permissions(server_path): # chown & chmod on path
     logging.critical("[consolidate_settings] TODO !!!!") # TODO
@@ -120,7 +126,7 @@ def create_warcamp(user_settings,config):
     if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result
     with open(f'{server_path}/config.json', 'w') as f:
         json.dump(result['plan'], f)
-    if "success" not in (result := generate_build_file(result['plan']))['status']: return result
+    if "success" not in (result := generate_build_file(server_path=server_path,config=result['plan']))['status']: return result
     return configure_permissions(server_path=server_path)
 
 def update_warcamp(game_uid,warcamp):
