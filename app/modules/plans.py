@@ -37,16 +37,24 @@ def download_latest_plans_from_repository(repo='github'): # On start (if empty) 
         return { "status" : "error", "info" : f"The repository [{repo}] is not yet supported." }
 
 def get_remote_plan_version(game_uid):
-    game_plan_url = config['settings']['plan_url'].format(game_uid)
-    if (response := requests.get(game_plan_url)).status_code == 200:
-        try:
+    try:
+        game_plan_url = config['settings']['plan_url'].format(game_uid)
+        if (response := requests.get(game_plan_url)).status_code == 200:
             return (json.loads(response.content))['metadata']['version']
-        except Exception as e:
-            logging.warn(f"[get_remote_plan_version] Plan definition for [{game_uid}] not found at [game_plan_url].")
+    except Exception as e:
+            logging.warn(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
     return None
 
 def get_local_plan_version(game_uid): # /home/peon/plans/{game_uid}
-    pass
+    try:
+        game_plan_path = f"{config['path']['plans']}/{game_uid}/plan.json"
+        if os.path.isfile(game_plan_path):
+            with open(game_plan_path) as json_file:
+                local_plan = json.load(json_file)    
+            return local_plan['metadata']['version']
+    except Exception as e:
+        logging.warn(f"[get_local_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_path}]. {e}")
+    return None
 
 def copy_default_plan_to_server_path(game_uid,server_path): # /home/peon/plans/{game_uid}/{server_name}/plan.json
     pass
@@ -78,7 +86,7 @@ def prepare_warcamp(user_settings,ignore_remote_plans=False):
 
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
-    logging.critical(get_remote_plan_version(game_uid='csgo2'))
+    logging.critical(get_local_plan_version(game_uid='csgo'))
 
 
 # root_path = "/root/peon"
