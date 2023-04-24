@@ -6,3 +6,4 @@ docker
 paramiko
 apscheduler
 python-dateutil
+gitpython
