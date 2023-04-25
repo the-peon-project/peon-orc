@@ -50,7 +50,7 @@ def update_latest_plans_from_repository(repo='github', force=True):
 def get_remote_plan_version(game_uid):
     try:
         game_plan_url = config['settings']['plan_url'].format(game_uid)
-        if (response := requests.get(game_plan_url)).status_code == 200:
+        if (response := requests.get(game_plan_url)).status_code == 200: # type: ignore
             return (json.loads(response.content))['metadata']['version']
     except Exception as e:
             logging.warning(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
@@ -68,7 +68,7 @@ def get_local_plan_definition(file_path):
     return None
 
 def get_required_settings(game_uid,config):
-    if (plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")):
+    if (plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")):  # type: ignore
         return ([key for key, value in plan['environment'].items() if value is None])
     else:
         return None
@@ -90,6 +90,7 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
     return { "status" : "success", "plan" : plan}
 
 def generate_build_file(server_path,config): # Take a config and create a docker-compose.yml file
+    print (json.dumps(config, indent=4))
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as file:
             yaml.dump(config,file, sort_keys=False, indent=4)
@@ -105,7 +106,7 @@ def configure_permissions(server_path): # chown & chmod on path
 def create_warcamp(user_settings,config):
     game_uid=user_settings["game_uid"]
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
-    warcamp=user_settings["warcamp"]
+    warcamp=user_settings['warcamp']
     server_path=f"{config['path']['servers']}/{game_uid}/{warcamp}"
     # Check if there is already a plan in that directory
     try: 
@@ -113,20 +114,20 @@ def create_warcamp(user_settings,config):
     except:
         logging.debug("[create_warcamp] No pre-existing config found.")
     # Get default plan definition
-    if not (default_plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no locally default available plan for {game_uid}."}
+    if not (default_plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no locally default available plan for {game_uid}."}  # type: ignore
     # Create new directory
     if not os.path.exists(server_path):
         os.makedirs(server_path, exist_ok=True)
     # Configure default settings and save plan as default
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     
-    default_plan['warcamp'] = user_settings['warcamp']
+    default_plan['metadata']['warcamp'] = user_settings['warcamp']
     with open(f'{server_path}/plan.json', 'w') as f:
         json.dump(default_plan, f, indent=4)
-    if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result
+    if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result  # type: ignore
     with open(f'{server_path}/config.json', 'w') as f:
         json.dump(result['plan'], f, indent=4)
-    if "success" not in (result := generate_build_file(server_path=server_path,config=result['plan']))['status']: return result
+    if "success" not in (result := generate_build_file(server_path=server_path,config=result['plan']))['status']: return result  # type: ignore
     return configure_permissions(server_path=server_path)
 
 def update_warcamp(game_uid,warcamp):
