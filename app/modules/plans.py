@@ -180,20 +180,21 @@ def update_warcamp(game_uid,warcamp):
     # Update config where possible (return highlighted change if something is missing)
     pass
 
-def get_warcamp_config(config_peon,game_uid,warcamp,user_mode=True):
+def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
     files_active = []
     warcamp_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
     warcamp_config_file=f"{warcamp_path}/config.json"
     if os.path.exists(warcamp_config_file):
+        # Load current config
         with open(warcamp_config_file, "r") as f:
             config_warcamp = json.load(f)
+        # Identify any loaded gamer server config files
         for filename in config_warcamp['files']:
             if os.path.isfile(f"{warcamp_path}/{filename}"):
                 files_active.append(filename)
         del config_warcamp['files']
-        if files_active: config_warcamp['files'] = files_active
-        #if user_mode:   
-        # Check if there is a config file and therefore supplimental info to provide
+        if files_active: config_warcamp['uploaded_files'] = files_active
+        # Check if there is a config folders and therefore supplimental info to provide
         if os.path.exists(f"{warcamp_path}/config"):
             supplimental_info = {}
             for file_path in glob.glob(os.path.join(f"{warcamp_path}/config/", '*')):
@@ -203,8 +204,20 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_mode=True):
                     contents = file.read()
                     supplimental_info[filename.lower()] = contents.strip() # Removed newlines and enforce 
             if supplimental_info: config_warcamp['supplimental'] = supplimental_info
-        # Check which files are currently mounted
-            
+        # Clean output for user friendlyness
+        if user_friendly: 
+            config_warcamp_uf = {}
+            config_warcamp_uf['game_uid'] = config_warcamp['metadata']['game_uid']
+            config_warcamp_uf['warcamp'] = config_warcamp['metadata']['warcamp']
+            config_warcamp_uf['description'] = config_warcamp['metadata']['description']
+            config_warcamp_uf['state'] = config_warcamp['supplimental']['state'] if config_warcamp['supplimental']['state'] else "UNKNOWN"
+            config_warcamp_uf['ip'] = config_warcamp['supplimental']['ip'] if config_warcamp['supplimental']['ip'] else ""
+            #for port in config_warcamp['ports']: config_warcamp_uf[port] = f"{config_warcamp['ports'][port][0]} [{config_warcamp['ports'][port][1]}]"
+            config_warcamp_uf['uploaded_files'] = files_active
+            for env_var in config_warcamp['environment']:
+                if env_var not in ['STEAM_ID','STEAM_GSLT']:
+                    config_warcamp_uf[env_var] = config_warcamp['environment'][env_var]
+            return {"status" : "success", "data" : config_warcamp_uf }
         return {"status" : "success", "data" : config_warcamp }
     else:
         return { "status" : "error", "info" : "There does not appear to be a server at that path."}
