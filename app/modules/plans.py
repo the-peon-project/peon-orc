@@ -67,21 +67,21 @@ def get_local_plan_definition(file_path):
         logging.warning(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
     return None
 
-def get_required_settings(config_peon,game_uid):
-    if (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")):  # type: ignore
+def get_required_settings(config_peon,game_uid,warcamp):
+    if (plan := get_local_plan_definition(f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json")):  # type: ignore
         return ([key for key, value in plan['environment'].items() if value is None])
     else:
         return None
 
 def consolidate_settings(config_peon,user_settings,plan): # Check exisiting config and update new config accordingly. If there is an unknown entity, throw an error.
-    # CHECK FOR REQUIRED VALUES
+    # CHECK IF ALL REQUIRED SETTINGS HAVE BEEN PROVIDED
     provided_settings = list(user_settings.keys())
-    required_settings = get_required_settings(config_peon,plan['metadata']['game_uid'])
+    required_settings = get_required_settings(config_peon=config_peon,game_uid=plan['metadata']['game_uid'],warcamp=plan['metadata']['warcamp'])
     if not any(setting in provided_settings for setting in required_settings): return { "status" : "error", "info" : f"Not all required server settings were provided. Namely: {required_settings}" }
-    # METADATA
+    # UPDATE METADATA
     if "description" in user_settings: plan['metadata']["description"] = user_settings["description"]
-    plan['metadata']["warcamp"] = user_settings["warcamp"]
-    plan['metadata']['hostname']=f"peon.warcamp.{user_settings['game_uid']}.{user_settings['warcamp']}"
+    if "warcamp" in user_settings: plan['metadata']["warcamp"] = user_settings["warcamp"]
+    plan['metadata']['hostname']=f"peon.warcamp.{user_settings['game_uid']}.{plan['metadata']['warcamp']}"
     plan['metadata']['container_name']=plan['metadata']['hostname']
     # ENVIRONMENT VARIABLES
     for key in plan['environment']:
@@ -126,7 +126,6 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
         if os.path.exists(f"{server_path}/{source}"):
             mount_list.append(f"./{source}:{target}")
     manifest['services']['server']['volumes']=mount_list
-    #print (yaml.dump(manifest,sort_keys=False, indent=4))
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as f:
             yaml.dump(manifest, f, sort_keys=False, indent=4)
@@ -156,15 +155,16 @@ def create_new_warcamp(config_peon,user_settings):
     server_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
     # Check if there is already a plan in that directory
     try: 
-        if (get_local_plan_definition(f"{server_path}/docker-compose.yml")): return { "status" : "error" , "info" : f"There is already a config for [{game_uid}] [{warcamp}]. Please run update on the game/server instead. (Can be added in a future release.)" }
+        if (get_local_plan_definition(f"{server_path}/config.json")): return { "status" : "error" , "info" : f"There is already a config.json file for [{game_uid}] [{warcamp}]. Please run update on the game/server instead. (Can be added in a future release.)" }
     except:
         logging.debug("[create_warcamp] No pre-existing config found.")
     # Get default plan definition
-    if not (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no locally default available plan for {game_uid}."}  # type: ignore
+    if not (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no local default plan for {game_uid}."}  # type: ignore
     # Create new game directory, if required
     if not os.path.exists(f"{config_peon['path']['servers']}/{game_uid}"):
         os.makedirs(f"{config_peon['path']['servers']}/{game_uid}", exist_ok=True)
     shutil.copytree(f"{config_peon['path']['plans']}/{game_uid}/", server_path)
+    shutil.copy(f"{server_path}/plan.json",f"{server_path}/config.json")
     # Configure default settings and save plan as default
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     plan['metadata']['warcamp'] = user_settings['warcamp']
