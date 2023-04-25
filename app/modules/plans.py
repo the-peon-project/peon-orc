@@ -6,6 +6,7 @@ import requests
 import sys
 import os
 import shutil
+import glob
 sys.path.insert(0,'/app')
 from modules.github import *
 from modules.peon import get_warcamp_name
@@ -180,12 +181,30 @@ def update_warcamp(game_uid,warcamp):
     pass
 
 def get_warcamp_config(config_peon,game_uid,warcamp,user_mode=True):
-    config_warcamp_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json"
-    if os.path.exists(config_warcamp_path):
-        with open(config_warcamp_path, "r") as f:
+    files_active = []
+    warcamp_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
+    warcamp_config_file=f"{warcamp_path}/config.json"
+    if os.path.exists(warcamp_config_file):
+        with open(warcamp_config_file, "r") as f:
             config_warcamp = json.load(f)
-        if user_mode:
-            pass
+        for filename in config_warcamp['files']:
+            if os.path.isfile(f"{warcamp_path}/{filename}"):
+                files_active.append(filename)
+        del config_warcamp['files']
+        if files_active: config_warcamp['files'] = files_active
+        #if user_mode:   
+        # Check if there is a config file and therefore supplimental info to provide
+        if os.path.exists(f"{warcamp_path}/config"):
+            supplimental_info = {}
+            for file_path in glob.glob(os.path.join(f"{warcamp_path}/config/", '*')):
+                filename = os.path.basename(file_path)
+                if filename.startswith('.'): continue # Skip `hidden` files
+                with open(file_path, 'r') as file:
+                    contents = file.read()
+                    supplimental_info[filename.lower()] = contents.strip() # Removed newlines and enforce 
+            if supplimental_info: config_warcamp['supplimental'] = supplimental_info
+        # Check which files are currently mounted
+            
         return {"status" : "success", "data" : config_warcamp }
     else:
         return { "status" : "error", "info" : "There does not appear to be a server at that path."}
@@ -195,12 +214,12 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_mode=True):
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
-    user_settings={
-        "game_uid"    : "vrising",
-        "description" : "A V Rising server",
-        "SERVER_NAME" : "countjugular",
-        "WORLD_NAME"  : "townsville",
-        "PASSWORD"    : "Zu88Zu88"
-    }
-    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    # print(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='mysticlake'))
+    # user_settings={
+    #     "game_uid"    : "vrising",
+    #     "description" : "A V Rising server",
+    #     "SERVER_NAME" : "countjugular",
+    #     "WORLD_NAME"  : "townsville",
+    #     "PASSWORD"    : "Zu88Zu88"
+    # }
+    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='thunderkeep'),indent=4))
