@@ -220,8 +220,9 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
             config_warcamp_uf['game_uid'] = config_warcamp['metadata']['game_uid']
             config_warcamp_uf['warcamp'] = config_warcamp['metadata']['warcamp']
             config_warcamp_uf['description'] = config_warcamp['metadata']['description']
-            config_warcamp_uf['state'] = config_warcamp['supplimental']['state'] if config_warcamp['supplimental']['state'] else "UNKNOWN"
-            config_warcamp_uf['ip'] = config_warcamp['supplimental']['ip'] if config_warcamp['supplimental']['ip'] else ""
+            if "supplimental" in config_warcamp:
+                config_warcamp_uf['state'] = config_warcamp['supplimental']['state'] if config_warcamp['supplimental']['state'] else "UNKNOWN"
+                config_warcamp_uf['ip'] = config_warcamp['supplimental']['ip'] if config_warcamp['supplimental']['ip'] else ""
             #for port in config_warcamp['ports']: config_warcamp_uf[port] = f"{config_warcamp['ports'][port][0]} [{config_warcamp['ports'][port][1]}]"
             config_warcamp_uf['uploaded_files'] = files_active
             for env_var in config_warcamp['environment']:
@@ -237,12 +238,12 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
-    user_settings={
-        "game_uid"    : "vrising",
-        "description" : "A V Rising server",
-        "SERVER_NAME" : "countjugular",
-        "WORLD_NAME"  : "townsville",
-        "PASSWORD"    : "Zu88Zu88"
-    }
-    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    # print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='thunderkeep'),indent=4))
+    # user_settings={
+    #     "game_uid"    : "vrising",
+    #     "description" : "A V Rising server",
+    #     "SERVER_NAME" : "countjugular",
+    #     "WORLD_NAME"  : "townsville",
+    #     "PASSWORD"    : "Zu88Zu88"
+    # }
+    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='wolfstead',user_friendly=True),indent=4))
