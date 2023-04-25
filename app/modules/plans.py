@@ -105,7 +105,7 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
         }
     }
     # Ports
-    for port in config_warcamp['ports'][0]:
+    for port in config_warcamp['ports']:
         name=list(port.keys())[0].upper()
         value=port[name][0]
         proto=port[name][1].lower()
@@ -148,6 +148,13 @@ def configure_permissions(server_path): # chown & chmod on path
     except Exception as e:
         return {"status" : "error", "info" : f"Unable to configure permissions for server. {e}"}
 
+def identify_available_port_group(config_peon,game_uid,warcamp):
+    ports = (get_local_plan_definition(f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json"))['ports']
+    ## TODO - Figure out how to check which ports are available.
+    # return {"status" : "error", "info" : f"The could not find a valid available port group to use for {game_uid}"}
+    ## Figure out how to check which ports are available. END
+    ports = ports[0]
+    return { "status" : "success", "open_ports" : ports }
 # WARCAMP FUNCTIONS
 def create_new_warcamp(config_peon,user_settings):
     game_uid=user_settings["game_uid"]
@@ -166,13 +173,16 @@ def create_new_warcamp(config_peon,user_settings):
         os.makedirs(f"{config_peon['path']['servers']}/{game_uid}", exist_ok=True)
     shutil.copytree(f"{config_peon['path']['plans']}/{game_uid}/", server_path)
     shutil.copy(f"{server_path}/plan.json",f"{server_path}/config.json")
-    # Configure default settings and save plan as default
+    # Configure default settings
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     plan['metadata']['warcamp'] = user_settings['warcamp']
     if "success" not in (result := consolidate_settings(config_peon=config_peon,user_settings=user_settings,plan=plan))['status']: return result  # type: ignore
+    plan=result['plan']
+    if "success" not in (result := identify_available_port_group(config_peon=config_peon,game_uid=game_uid,warcamp=warcamp))['status']: return result # type: ignore
+    plan['ports'] = result['open_ports']
     with open(f'{server_path}/config.json', 'w') as f:
-        json.dump(result['plan'], f, indent=4)
-    if "success" not in (result := update_build_file(server_path=server_path,config_warcamp=result['plan']))['status']: return result  # type: ignore
+        json.dump(plan, f, indent=4)
+    if "success" not in (result := update_build_file(server_path=server_path,config_warcamp=plan))['status']: return result  # type: ignore
     if "success" not in configure_permissions(server_path=server_path)['status']: return result
     return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}"}
 
@@ -227,12 +237,12 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
-    # user_settings={
-    #     "game_uid"    : "vrising",
-    #     "description" : "A V Rising server",
-    #     "SERVER_NAME" : "countjugular",
-    #     "WORLD_NAME"  : "townsville",
-    #     "PASSWORD"    : "Zu88Zu88"
-    # }
-    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='thunderkeep'),indent=4))
+    user_settings={
+        "game_uid"    : "vrising",
+        "description" : "A V Rising server",
+        "SERVER_NAME" : "countjugular",
+        "WORLD_NAME"  : "townsville",
+        "PASSWORD"    : "Zu88Zu88"
+    }
+    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    # print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='thunderkeep'),indent=4))
