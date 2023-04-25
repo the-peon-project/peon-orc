@@ -5,6 +5,7 @@ import yaml
 import requests
 import sys
 import os
+import shutil
 sys.path.insert(0,'/app')
 from modules.github import *
 from modules.peon import get_warcamp_name
@@ -81,7 +82,7 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
     # METADATA
     if "description" in user_settings: plan['metadata']["description"] = user_settings["description"]
     plan['metadata']["warcamp"] = user_settings["warcamp"]
-    plan['metadata']['hostname']+=f".{user_settings['warcamp']}"
+    plan['metadata']['hostname']=f"peon.warcamp.{user_settings['game_uid']}.{user_settings['warcamp']}"
     plan['metadata']['container_name']=plan['metadata']['hostname']
     # ENVIRONMENT VARIABLES
     for key in plan['environment']:
@@ -89,10 +90,12 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
             plan['environment'][key] = user_settings[key]
     return { "status" : "success", "plan" : plan}
 
-def generate_build_file(server_path,config): # Take a config and create a docker-compose.yml file
+def update_build_file(server_path,config): # Take a config and create a docker-compose.yml file
     manifest = {}
+    port_list = []
+    env_var_list = []
+    mount_list = []
     # Metadata
-# Metadata
     manifest['version'] = "3"
     manifest['services'] = {
         'server': {
@@ -101,30 +104,49 @@ def generate_build_file(server_path,config): # Take a config and create a docker
             'image': config['metadata']['image']
         }
     }
-    port_list = []
-    for port in config['ports'][0]:
-        name=list(port.keys())[0]
-        value=port[name][0]
-        proto=port[name][1]
-        config['environment'][name] = value # Create an envioronment variable for the port
     # Ports
-    #manifest['services']['server']['ports']
-    # Environment
-    
+    for port in config['ports'][0]:
+        name=list(port.keys())[0].upper()
+        value=port[name][0]
+        proto=port[name][1].lower()
+        if proto in ['tcp','udp']:
+            port_list.append(f"{value}:{value}/{proto}")
+        else:
+            port_list.append(f"{value}:{value}/tcp")
+            port_list.append(f"{value}:{value}/udp")
+        env_var_list.append(f"{name}={value}")
+    manifest['services']['server']['ports'] = port_list
+    # Environment Variables
+    for env_var, value in config['environment'].items(): env_var_list.append(f"{env_var}='{value}'")
+    manifest['services']['server']['environment']=env_var_list
     # Volumes
-    
-    
-    print (yaml.dump(manifest,sort_keys=False, indent=4))
+    for source, target in config['volumes'].items(): mount_list.append(f"./{source}:{target}")
+    # Custom file mount
+    for source, target in config['files'].items():
+        if os.path.exists(f"{server_path}/{source}"):
+            mount_list.append(f"./{source}:{target}")
+    manifest['services']['server']['volumes']=mount_list
+    #print (yaml.dump(manifest,sort_keys=False, indent=4))
     try:
-        with open(f"{server_path}/docker-compose.yml", "w") as file:
-            yaml.dump(config,file, sort_keys=False, indent=4)
-        return { "status" : "success" }
+        with open(f"{server_path}/docker-compose.yml", "w") as f:
+            yaml.dump(manifest, f, sort_keys=False, indent=4)
+        return { "status" : "success" , "manifest" : manifest}
     except Exception as e:
         return { "status" : "error", "info" : f"Could not create the `docker-compose.yml` file. {e}" }
         
 
 def configure_permissions(server_path): # chown & chmod on path
-    logging.critical("[consolidate_settings] TODO !!!!") # TODO
+    try:
+        for filename in os.listdir(server_path):
+            filepath = os.path.join(server_path, filename)
+            print(filepath)
+            if os.path.isfile(filepath):
+                os.chown(filepath, 1000, 1000)
+                if any(filename.endswith(valid_scripts) for valid_scripts in ['server_start','init_custom']):
+                    os.chmod(filepath, 0o755)
+        return {"status" : "success"}
+    except Exception as e:
+        return {"status" : "error", "info" : f"Unable to configure permissions for server. {e}"}
 
 # WARCAMP FUNCTIONS
 def create_warcamp(user_settings,config):
@@ -139,9 +161,10 @@ def create_warcamp(user_settings,config):
         logging.debug("[create_warcamp] No pre-existing config found.")
     # Get default plan definition
     if not (default_plan := get_local_plan_definition(f"{config['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no locally default available plan for {game_uid}."}  # type: ignore
-    # Create new directory
-    if not os.path.exists(server_path):
-        os.makedirs(server_path, exist_ok=True)
+    # Create new game directory, if required
+    if not os.path.exists(f"{config['path']['servers']}/{game_uid}"):
+        os.makedirs(f"{config['path']['servers']}/{game_uid}", exist_ok=True)
+    shutil.copytree(f"{config['path']['plans']}/{game_uid}/", server_path)
     # Configure default settings and save plan as default
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     
@@ -151,7 +174,7 @@ def create_warcamp(user_settings,config):
     if "success" not in (result := consolidate_settings(user_settings=user_settings,plan=default_plan))['status']: return result  # type: ignore
     with open(f'{server_path}/config.json', 'w') as f:
         json.dump(result['plan'], f, indent=4)
-    if "success" not in (result := generate_build_file(server_path=server_path,config=result['plan']))['status']: return result  # type: ignore
+    if "success" not in (result := update_build_file(server_path=server_path,config=result['plan']))['status']: return result  # type: ignore
     return configure_permissions(server_path=server_path)
 
 def update_warcamp(game_uid,warcamp):
