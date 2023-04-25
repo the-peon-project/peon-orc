@@ -223,10 +223,12 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
             if "supplimental" in config_warcamp:
                 config_warcamp_uf['state'] = config_warcamp['supplimental']['state'] if config_warcamp['supplimental']['state'] else "UNKNOWN"
                 config_warcamp_uf['ip'] = config_warcamp['supplimental']['ip'] if config_warcamp['supplimental']['ip'] else ""
-            #for port in config_warcamp['ports']: config_warcamp_uf[port] = f"{config_warcamp['ports'][port][0]} [{config_warcamp['ports'][port][1]}]"
-            config_warcamp_uf['uploaded_files'] = files_active
+            if files_active: config_warcamp_uf['uploaded_files'] = files_active
+            for port_dict in config_warcamp['ports']:
+                port_name, (port_number, protocol) = list(port_dict.items())[0]
+                config_warcamp_uf[port_name] = f"{port_number}/{protocol}"
             for env_var in config_warcamp['environment']:
-                if env_var not in ['STEAM_ID','STEAM_GSLT']:
+                if env_var not in ['STEAM_ID','STEAM_GSLT','STEAM_PASSWORD']:
                     config_warcamp_uf[env_var] = config_warcamp['environment'][env_var]
             return {"status" : "success", "data" : config_warcamp_uf }
         return {"status" : "success", "data" : config_warcamp }
