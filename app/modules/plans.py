@@ -90,7 +90,31 @@ def consolidate_settings(user_settings,plan): # Check exisiting config and updat
     return { "status" : "success", "plan" : plan}
 
 def generate_build_file(server_path,config): # Take a config and create a docker-compose.yml file
-    print (json.dumps(config, indent=4))
+    manifest = {}
+    # Metadata
+# Metadata
+    manifest['version'] = "3"
+    manifest['services'] = {
+        'server': {
+            'container_name': config['metadata']['container_name'],
+            'hostname': config['metadata']['hostname'],
+            'image': config['metadata']['image']
+        }
+    }
+    port_list = []
+    for port in config['ports'][0]:
+        name=list(port.keys())[0]
+        value=port[name][0]
+        proto=port[name][1]
+        config['environment'][name] = value # Create an envioronment variable for the port
+    # Ports
+    #manifest['services']['server']['ports']
+    # Environment
+    
+    # Volumes
+    
+    
+    print (yaml.dump(manifest,sort_keys=False, indent=4))
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as file:
             yaml.dump(config,file, sort_keys=False, indent=4)
