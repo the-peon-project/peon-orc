@@ -117,7 +117,8 @@ def update_build_file(server_path,config): # Take a config and create a docker-c
         env_var_list.append(f"{name}={value}")
     manifest['services']['server']['ports'] = port_list
     # Environment Variables
-    for env_var, value in config['environment'].items(): env_var_list.append(f"{env_var}='{value}'")
+    for env_var, value in config['environment'].items(): 
+        env_var_list.append(f"{env_var}={value}")
     manifest['services']['server']['environment']=env_var_list
     # Volumes
     for source, target in config['volumes'].items(): mount_list.append(f"./{source}:{target}")
@@ -175,7 +176,8 @@ def create_warcamp(user_settings,config):
     with open(f'{server_path}/config.json', 'w') as f:
         json.dump(result['plan'], f, indent=4)
     if "success" not in (result := update_build_file(server_path=server_path,config=result['plan']))['status']: return result  # type: ignore
-    return configure_permissions(server_path=server_path)
+    if "success" not in configure_permissions(server_path=server_path)['status']: return result
+    return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}"}
 
 def update_warcamp(game_uid,warcamp):
     # Update config where possible (return highlighted change if something is missing)
