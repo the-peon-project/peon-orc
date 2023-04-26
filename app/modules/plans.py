@@ -7,8 +7,6 @@ import sys
 import os
 import shutil
 import glob
-import docker
-from compose import project
 sys.path.insert(0,'/app')
 from modules.github import *
 from modules.peon import get_warcamp_name
@@ -80,7 +78,8 @@ def consolidate_settings(config_peon,user_settings,plan): # Check exisiting conf
     # CHECK IF ALL REQUIRED SETTINGS HAVE BEEN PROVIDED
     provided_settings = list(user_settings.keys())
     required_settings = get_required_settings(config_peon=config_peon,game_uid=plan['metadata']['game_uid'],warcamp=plan['metadata']['warcamp'])
-    if not any(setting in provided_settings for setting in required_settings): return { "status" : "error", "info" : f"Not all required server settings were provided. Namely: {required_settings}" }
+    if required_settings: 
+        if not any(setting in provided_settings for setting in required_settings): return { "status" : "error", "info" : f"Not all required server settings were provided. Namely: {required_settings}" }
     # UPDATE METADATA
     if "description" in user_settings: plan['metadata']["description"] = user_settings["description"]
     if "warcamp" in user_settings: plan['metadata']["warcamp"] = user_settings["warcamp"]
@@ -197,6 +196,7 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
     files_active = []
     warcamp_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
     warcamp_config_file=f"{warcamp_path}/config.json"
+    warcamp_active_config_file=f"{warcamp_path}/docker-compose.yml"
     if os.path.exists(warcamp_config_file):
         # Load current config
         with open(warcamp_config_file, "r") as f:
@@ -218,7 +218,7 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
                     contents = file.read()
                     supplimental_info[filename.lower()] = contents.strip() # Removed newlines and enforce 
             if supplimental_info: config_warcamp['supplimental'] = supplimental_info
-        
+        # Get container information
         # Clean output for user friendlyness
         if user_friendly: 
             config_warcamp_uf = {}
@@ -272,4 +272,9 @@ if __name__ == "__main__":
     #     "PASSWORD"    : "Zu88Zu88"
     # }
     # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='valhiem',warcamp='wolfland',user_friendly=True),indent=4))
+    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='valhiem',warcamp='wolfland',user_friendly=True),indent=4))
+    user_settings={
+        "game_uid"    : "quake3",
+        "description" : "A quake3 erver"
+    }
+    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
