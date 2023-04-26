@@ -7,6 +7,8 @@ import sys
 import os
 import shutil
 import glob
+import docker
+from compose import project
 sys.path.insert(0,'/app')
 from modules.github import *
 from modules.peon import get_warcamp_name
@@ -200,11 +202,12 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
         with open(warcamp_config_file, "r") as f:
             config_warcamp = json.load(f)
         # Identify any loaded gamer server config files
-        for filename in config_warcamp['files']:
-            if os.path.isfile(f"{warcamp_path}/{filename}"):
-                files_active.append(filename)
-        del config_warcamp['files']
-        if files_active: config_warcamp['uploaded_files'] = files_active
+        if 'files' in config_warcamp:
+            for filename in config_warcamp['files']:
+                if os.path.isfile(f"{warcamp_path}/{filename}"):
+                    files_active.append(filename)
+            del config_warcamp['files']
+            if files_active: config_warcamp['uploaded_files'] = files_active
         # Check if there is a config folders and therefore supplimental info to provide
         if os.path.exists(f"{warcamp_path}/config"):
             supplimental_info = {}
@@ -215,6 +218,7 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
                     contents = file.read()
                     supplimental_info[filename.lower()] = contents.strip() # Removed newlines and enforce 
             if supplimental_info: config_warcamp['supplimental'] = supplimental_info
+        
         # Clean output for user friendlyness
         if user_friendly: 
             config_warcamp_uf = {}
@@ -260,11 +264,12 @@ if __name__ == "__main__":
     # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
     #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='csgo',warcamp='sanctuaryvalley',user_friendly=True),indent=4))
     # VALHIEM
-    user_settings={
-        "game_uid"    : "valhiem",
-        "description" : "A V Rising server",
-        "SERVER_NAME" : "tpp-valhiem-01",
-        "WORLD_NAME"  : "valhalla",
-        "PASSWORD"    : "Zu88Zu88"
-    }
-    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    # user_settings={
+    #     "game_uid"    : "valhiem",
+    #     "description" : "A V Rising server",
+    #     "SERVER_NAME" : "tpp-valhiem-01",
+    #     "WORLD_NAME"  : "valhalla",
+    #     "PASSWORD"    : "Zu88Zu88"
+    # }
+    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='valhiem',warcamp='wolfland',user_friendly=True),indent=4))
