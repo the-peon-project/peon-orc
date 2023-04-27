@@ -3,18 +3,18 @@ import logging
 import traceback
 import json
 from pathlib import Path
+import sys
+sys.path.insert(0,'/app')
 from modules import client, servers, prefix, schedule_file
-from .shell import execute_shell
-from .plans import *
+from modules.shell import execute_shell
+from modules.plans import *
 #from .scheduler import schedule_read_from_disk
 
-root_path = "/root/peon"
+root_path = "/home/peon"
 server_root_path = "{0}/servers".format(root_path)
-
 
 def server_get_uid(server):
     return "{0}.{1}".format(server['game_uid'], server['servername'])
-
 
 def server_get_stats(server_uid):
     logging.debug("Getting stats")
@@ -245,3 +245,4 @@ def server_create(server_uid, description, settings=[]):
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a',
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    print(servers_get_all())
