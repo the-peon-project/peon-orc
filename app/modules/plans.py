@@ -245,36 +245,33 @@ def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
 if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
-    # # VRISING
-    # user_settings={
-    #     "game_uid"    : "vrising",
-    #     "description" : "A V Rising server",
-    #     "SERVER_NAME" : "countjugular",
-    #     "WORLD_NAME"  : "townsville",
-    #     "PASSWORD"    : "Zu88Zu88"
-    # }
-    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='vrising',warcamp='wolfstead',user_friendly=True),indent=4))
+    # VRISING
+    user_settings={
+        "game_uid"    : "vrising",
+        "description" : "A V Rising server",
+        "SERVER_NAME" : "countjugular",
+        "WORLD_NAME"  : "world1",
+        "PASSWORD"    : "rigrich"
+    }
     # CSGO
     # user_settings={
     #     "game_uid"    : "csgo",
     #     "description" : "A CSGO server",
     #     "SERVER_NAME" : "fightnight",
-    #     "STEAM_GSLT"  : "29FAFDA08BF87A432AD77316C352C430",
+    #     "STEAM_GSLT"  : "",
     # }
-    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='csgo',warcamp='sanctuaryvalley',user_friendly=True),indent=4))
-    # VALHIEM
+    # VALHEIM
     # user_settings={
-    #     "game_uid"    : "valhiem",
+    #     "game_uid"    : "valheim",
     #     "description" : "A V Rising server",
-    #     "SERVER_NAME" : "tpp-valhiem-01",
-    #     "WORLD_NAME"  : "valhalla",
+    #     "SERVER_NAME" : "starwarshores",
+    #     "WORLD_NAME"  : "Umlatt",
     #     "PASSWORD"    : "Zu88Zu88"
     # }
-    # print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
-    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid='valhiem',warcamp='wolfland',user_friendly=True),indent=4))
-    user_settings={
-        "game_uid"    : "quake3",
-        "description" : "A quake3 erver"
-    }
-    print(create_new_warcamp(config_peon=config_peon,user_settings=user_settings))
+    # QUAKE 3
+    # user_settings={
+    #     "game_uid"    : "quake3",
+    #     "description" : "A quake3 erver"
+    # }
+    server = create_new_warcamp(config_peon=config_peon,user_settings=user_settings)
+    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid=server['game_uid'],warcamp=server['warcamp'],user_friendly=True),indent=4))
