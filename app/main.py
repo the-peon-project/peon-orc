@@ -20,7 +20,7 @@ api_v1 = Api(app)
 api_v1.add_resource(Servers, "/api/1.0/servers")
 api_v1.add_resource(Server, "/api/1.0/server/<string:action>/<string:server_uid>")
 api_v1.add_resource(Plans, "/api/1.0/plans")
-# api_v1.add_resource(Plan, "/api/1.0/plan/<string:game_uid>")
+api_v1.add_resource(Plan, "/api/1.0/plan/<string:game_uid>")
 
 # Start flask listener
 if __name__ == "__main__":
@@ -28,9 +28,9 @@ if __name__ == "__main__":
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     logging.debug("[START]")
     # Start the schedulers timer
-    scheduler_tick()
+    # TODO scheduler_tick()
     # load all registered servers into memory
     servers_get_all()
     # Start Orchestrator services
-    logging.debug(app.run(host="0.0.0.0", port=5000, debug=False)) # Setting DEBUG=true will make timer trigger x2
+    logging.debug(app.run(host="0.0.0.0", port=5000, debug=True)) # Setting DEBUG=true will make timer trigger x2
     logging.debug("[END]")
