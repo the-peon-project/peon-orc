@@ -33,28 +33,27 @@ def schedule_read_from_disk():
 
 def server_get_server(server):
     server_full_uid = (server.name).split('.')
-    try:
-        with open('{0}/{1}/{2}/description'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
-            description = f.read()
+    server_path=f"{server_root_path}/{server_full_uid[2]}/{server_full_uid[3]}"
+    try:            
+        with open(f'{server_path}/config.json', 'r') as file:
+            config_data = dict(json.load(file))
+        description = config_data['metadata']['description']
+        version_peon = config_data['metadata']['version']
     except:
-        description = "None - Please add a description"
+        description = "None - Please add a description"        
     try:
+        server_state = server.status
+        server_config = {}
         if server.status == "running":
-            with open('{0}/{1}/{2}/data/server.state'.format(server_root_path, server_full_uid[2], server_full_uid[3]), 'r') as f:
-                server_state = f.read()
-            filepath = Path('{0}/{1}/{2}/config/server.config'.format(
-                server_root_path, server_full_uid[2], server_full_uid[3]))
-            if filepath.is_file():
-                with open(filepath, 'r') as f:
-                    server_config = f.read()
-            else:
-                server_config = "UNAVAILABLE"
-        else:
-            server_state = "OFFLINE"
-            server_config = "UNAVAILABLE"
+            for filename in os.listdir(f"{server_path}/config/"):
+                if os.path.isdir(os.path.join(f"{server_path}/config/", filename)):
+                    continue
+                with open(os.path.join(f"{server_path}/config/", filename), 'r') as file:
+                    contents = file.read().strip()
+                server_config[filename] = contents
     except:
         server_state = "UNKNOWN"
-        server_config = "UNKNOWN"
+        server_config = {"state" : "OFFLINE"}
     try:
         epoch_time = None
         for item in schedule_read_from_disk():
@@ -67,7 +66,7 @@ def server_get_server(server):
         'servername': server_full_uid[3],
         'container_state': server.status,
         'server_state': server_state,
-        'server_config': server_config,
+        'server_config': dict(server_config),
         'description': description,
         'time': epoch_time
     }
@@ -84,7 +83,7 @@ def server_check(server_uid):
 
 def servers_get_all():
     logging.debug("Checking exisitng servers")
-    servers.clear()
+    servers = []
     containers = client.containers.list(all)
     game_servers = []
     for game_server in containers:
@@ -92,7 +91,7 @@ def servers_get_all():
             game_servers.append(game_server)
     for server in game_servers:
         servers.append(server_get_server(server))
-    return {"response" : "OK"}
+    return servers
 
 
 def server_update_description(server, description):
