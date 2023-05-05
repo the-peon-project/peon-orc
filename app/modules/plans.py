@@ -11,7 +11,6 @@ sys.path.insert(0,'/app')
 from modules.github import *
 from modules.peon import get_warcamp_name
 
-
 # SPECIAL FUNCTIONS
 def identify_newest_version(version_local, version_remote):
     # split the version strings into their components
@@ -56,6 +55,25 @@ def get_remote_plan_version(config_peon,game_uid):
     except Exception as e:
             logging.warning(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
     return None
+
+def get_plans_local(config_peon):
+    try:
+        with open(f"{config_peon['path']['plans']}/plans.json") as json_file:
+            plans = json.load(json_file)
+        return plans
+    except Exception as e:
+        logging.error(f"[get_plans_local] Could not get the local plans file. {e}")
+        return None
+
+def get_plans_remote(config_peon):
+    try:
+        response = requests.get(config_peon['settings']['plans_url'])
+        with open(f"{config_peon['path']['plans']}/plans.json", mode='wb') as f:
+            f.write(response.content)
+        return get_plans_local(config_peon=config_peon)
+    except Exception as e:
+        logging.error(f"[get_plans_remote] There was an issue getting the latest plans from the Github repo. {e}")
+        return None
 
 # LOCAL PLAN FUNCTIONS
 def get_local_plan_definition(file_path):
@@ -189,14 +207,14 @@ def create_new_warcamp(config_peon,user_settings):
     return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}"}
 
 def update_warcamp(game_uid,warcamp):
-    # Update config where possible (return highlighted change if something is missing)
+    # TODO Update config where possible (return highlighted change if something is missing)
     pass
 
 def get_warcamp_config(config_peon,game_uid,warcamp,user_friendly=True):
     files_active = []
     warcamp_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
     warcamp_config_file=f"{warcamp_path}/config.json"
-    warcamp_active_config_file=f"{warcamp_path}/docker-compose.yml"
+    #warcamp_active_config_file=f"{warcamp_path}/docker-compose.yml"
     if os.path.exists(warcamp_config_file):
         # Load current config
         with open(warcamp_config_file, "r") as f:
@@ -246,32 +264,33 @@ if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
     # VRISING
-    user_settings={
-        "game_uid"    : "vrising",
-        "description" : "A V Rising server",
-        "SERVER_NAME" : "countjugular",
-        "WORLD_NAME"  : "world1",
-        "PASSWORD"    : "rigrich"
-    }
+    #user_settings={
+    #    "game_uid"    : "vrising",
+    #    "description" : "A V Rising server",
+    #    "SERVER_NAME" : "countjugular",
+    #    "WORLD_NAME"  : "world1",
+    #    "PASSWORD"    : "rigrich"
+    #}
     # CSGO
     # user_settings={
     #     "game_uid"    : "csgo",
     #     "description" : "A CSGO server",
     #     "SERVER_NAME" : "fightnight",
-    #     "STEAM_GSLT"  : "",
+    #     "STEAM_GSLT"  : "29FAFDA08BF87A432AD77316C352C430",
     # }
     # VALHEIM
     # user_settings={
-    #     "game_uid"    : "valheim",
-    #     "description" : "A V Rising server",
-    #     "SERVER_NAME" : "starwarshores",
-    #     "WORLD_NAME"  : "Umlatt",
-    #     "PASSWORD"    : "Zu88Zu88"
-    # }
+    #      "game_uid"    : "valheim",
+    #      "description" : "A Valheim server",
+    #      "SERVER_NAME" : "richington",
+    #      "WORLD_NAME"  : "richington",
+    #      "PASSWORD"    : "Zu88Zu88"
+    #  }
     # QUAKE 3
     # user_settings={
     #     "game_uid"    : "quake3",
     #     "description" : "A quake3 erver"
     # }
-    server = create_new_warcamp(config_peon=config_peon,user_settings=user_settings)
-    print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid=server['game_uid'],warcamp=server['warcamp'],user_friendly=True),indent=4))
+    # - - - - - 
+    # server = create_new_warcamp(config_peon=config_peon,user_settings=user_settings)
+    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid=server['game_uid'],warcamp=server['warcamp'],user_friendly=True),indent=4))

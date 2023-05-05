@@ -1,6 +1,7 @@
 {
     "settings" : {
         "repo" : "github",
+        "plans_url" : "https://raw.githubusercontent.com/the-peon-project/peon-warplans/main/plans.json",
         "plan_url" : "https://raw.githubusercontent.com/the-peon-project/peon-warplans/main/{0}/plan.json"
     },
     "api": {

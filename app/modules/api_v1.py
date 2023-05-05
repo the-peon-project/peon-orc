@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from flask import request
-from flask_restful import Resource, reqparse, abort, marshal, fields
-from modules import servers, settings, prefix
+from flask_restful import Resource, reqparse
+from modules import prefix
 from .servers import *
 from .plans import *
 from .security import *
@@ -114,16 +114,16 @@ class Servers(Resource):
         self.reqparse.add_argument(
             "description", type=str, required=True, help="A server description can be provided", location="json")
         self.reqparse.add_argument(
-            "settings", type=list, required=True, help="Settings data provided for the server. Can be an empty list.", location="json")
+            "settings", type=list, required=False, help="Settings data provided for the server. Can be an empty list.", location="json")
+    
     # GET - List all servers
-
     def get(self):
         logging.debug("APIv1 - Servers Get/List")
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
         servers = servers_get_all()
         return servers, 200
+    
     # POST - Create a server
-
     def post(self):
         logging.debug("APIv1 - Server Create")
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
@@ -156,7 +156,7 @@ class Servers(Resource):
             else:
                 return response, 501
         except Exception as e:
-            logging.error(traceback.format_exc())
+            logging.error(f"[API-Servers-POST] Could not create a server. <{e}>")
             return {"error": "Something bad happened. Check the logs for details. Please submit to (@peon devs) to improve error handling."}, 500
 
 
@@ -171,18 +171,20 @@ class Plans(Resource):
             "logo", type=str, required=True, help="A plan logo must be provided", location="json")
         self.reqparse.add_argument(
             "source", type=str, required=True, help="The source files for the PEON plan must be provided.", location="json")
+        self.config_peon = json.load(open("/app/config.json", 'r'))
     # GET - List all plans
 
     def get(self):
         logging.debug("APIv1 - Plans Get/List")
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
-        plans = plans_get_current()
-        return{"plans": [marshal(plan, planFields) for plan in plans]}
+        if ( plans := get_plans_local(config_peon=self.config_peon)): # type: ignore
+            return plans, 200
+        return {"error" : "There was an issue getting the local plans list." }, 404
 
     # PUT - Update the plans file
     def put(self):
         logging.debug("APIv1 - Plans update List")
         if not authorized(request.headers): return {"error" : "Not authorized."}, 401
-        get_latest_plans_list()
-        plans = plans_get_current()
-        return{"plans": [marshal(plan, planFields) for plan in plans]}
+        if ( plans := get_plans_remote(config_peon=self.config_peon)): # type: ignore
+            return plans, 200
+        return {"error" : "There was an issue getting the local plans list." }, 404
