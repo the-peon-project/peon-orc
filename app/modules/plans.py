@@ -86,6 +86,24 @@ def get_local_plan_definition(file_path):
         logging.warning(f"[get_game_plan_from_file] The plan definition file [{file_path}] was not found. {e}")
     return None
 
+def get_all_required_settings(config_peon,game_uid):
+    try:
+        if (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")):  # type: ignore
+            settings = plan['environment']
+            settings['description'] = f"A PEON game server for {game_uid}."
+            required = {}
+            optional = {}
+            for key, value in settings.items():
+                if key not in ['STEAM_ID']:
+                    if value: 
+                        optional[key] = f"{value}"
+                    else: required[key] = ""
+            required.update(optional)
+            return required
+    except Exception as e:
+        logging.error(f"[get_all_required_settings] An issue occured getting the required settings for {game_uid}. <{e}>")
+    return None
+
 def get_required_settings(config_peon,game_uid,warcamp):
     if (plan := get_local_plan_definition(f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json")):  # type: ignore
         return ([key for key, value in plan['environment'].items() if value is None])
@@ -153,7 +171,6 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
         return { "status" : "success" , "manifest" : manifest}
     except Exception as e:
         return { "status" : "error", "info" : f"Could not create the `docker-compose.yml` file. {e}" }
-        
 
 def configure_permissions(server_path): # chown & chmod on path
     try:
@@ -175,6 +192,7 @@ def identify_available_port_group(config_peon,game_uid,warcamp):
     ## Figure out how to check which ports are available. END
     ports = ports[0]
     return { "status" : "success", "open_ports" : ports }
+
 # WARCAMP FUNCTIONS
 def create_new_warcamp(config_peon,user_settings):
     game_uid=user_settings["game_uid"]
@@ -204,7 +222,7 @@ def create_new_warcamp(config_peon,user_settings):
         json.dump(plan, f, indent=4)
     if "success" not in (result := update_build_file(server_path=server_path,config_warcamp=plan))['status']: return result  # type: ignore
     if "success" not in configure_permissions(server_path=server_path)['status']: return result
-    return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}"}
+    return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}", "server_path" : f"{server_path}" }
 
 def update_warcamp(game_uid,warcamp):
     # TODO Update config where possible (return highlighted change if something is missing)
