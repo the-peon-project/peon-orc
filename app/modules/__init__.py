@@ -8,8 +8,5 @@ schedule_file="/home/peon/servers/schedule.json"
 settings = json.load(open(f"{install_path}/config.json", 'r'))
 # Container prefix
 prefix = "peon.warcamp."
-# Server list
-global servers
-servers = []
 # Docker client file
 client = docker.from_env()
