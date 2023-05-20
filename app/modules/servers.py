@@ -8,7 +8,6 @@ sys.path.insert(0,'/app')
 from modules import client, prefix, schedule_file
 from modules.shell import execute_shell
 from modules.plans import *
-#from .scheduler import schedule_read_from_disk
 
 root_path = "/home/peon"
 server_root_path = "{0}/servers".format(root_path)
@@ -72,14 +71,12 @@ def server_get_server(server):
     }
     return server
 
-
 def server_check(server_uid):
     logging.debug("Checking if server exists")
     try:
         return client.containers.get("{0}{1}".format(prefix, server_uid))
     except:
         return "error"
-
 
 def servers_get_all():
     logging.debug("Checking existing servers")
@@ -92,7 +89,6 @@ def servers_get_all():
     for server in game_servers:
         servers.append(server_get_server(server))
     return servers
-
 
 def server_update_description(server, description):
     logging.debug("Updating {0}.{1}'s description to [{2}]".format(
