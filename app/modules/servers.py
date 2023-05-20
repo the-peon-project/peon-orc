@@ -99,36 +99,36 @@ def server_update_description(server, description):
         server['game_uid'], server['servername'], description))
     with open("{0}/servers/{1}/{2}/description".format(root_path, server['game_uid'], server['servername']), 'w') as f:
         f.write(description)
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.start()
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 def server_stop(server_uid):
     logging.info("Stopping server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.stop()
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 def server_restart(server_uid):
     logging.info("Restarting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.restart()
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 def server_delete_files(server_uid):
     execute_shell("rm -rf {0}/{1}".format(server_root_path, str(server_uid).replace(".", "/")))
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     container = client.containers.get("{0}{1}".format(prefix, server_uid))
     container.remove()
-    return {"response" : "OK"}
+    return {"status" : "success"}
 
 def add_envs(env_vars, content):
     for key in content.keys():
@@ -238,7 +238,7 @@ def server_create(config_peon,user_settings):
     #     except:
     #         logging.warn(f"Failed - container [{container_name}] was not removed. {e}")
     # if error == None:
-    #     return {"response" : "OK"}
+    #     return {"status" : "success"}
     # else:
     #     return {"error" : error}
 
