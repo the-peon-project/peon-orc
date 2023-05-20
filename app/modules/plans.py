@@ -4,12 +4,13 @@ import json
 import yaml
 import requests
 import sys
-import os
 import shutil
 import glob
 sys.path.insert(0,'/app')
 from modules.github import *
+from modules.shell import execute_shell
 from modules.peon import get_warcamp_name
+from modules import settings
 
 # SPECIAL FUNCTIONS
 def identify_newest_version(version_local, version_remote):
@@ -74,6 +75,15 @@ def get_plans_remote(config_peon):
     except Exception as e:
         logging.error(f"[get_plans_remote] There was an issue getting the latest plans from the Github repo. {e}")
         return None
+
+def configure_plan_permissions():
+    try:
+        logging.error("Setting folder permissions...")
+        execute_shell(cmd_as_string=f"chown -R 1000:1000 {settings['path']['plans']}")
+        return { "status" : "success" }
+    except Exception as e:
+        logging.error("--- FAILED")
+        return {"status" : "error", "info" : "Could not set permissions on plans folder.", "exception" : f"{e}" }
 
 # LOCAL PLAN FUNCTIONS
 def get_local_plan_definition(file_path):
@@ -174,13 +184,14 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
 
 def configure_permissions(server_path): # chown & chmod on path
     try:
-        for filename in os.listdir(server_path):
-            filepath = os.path.join(server_path, filename)
-            print(filepath)
-            if os.path.isfile(filepath):
-                os.chown(filepath, 1000, 1000)
-                if any(filename.endswith(valid_scripts) for valid_scripts in ['server_start','init_custom']):
-                    os.chmod(filepath, 0o755)
+        execute_shell(cmd_as_string=f"chown -R 1000:1000 {server_path}")
+        execute_shell(cmd_as_string=f"chmod 755 {server_path}/scripts/.")
+        # for filename in os.listdir(server_path):
+        #     filepath = os.path.join(server_path, filename)
+        #     if os.path.isfile(filepath):
+        #         os.chown(filepath, 1000, 1000)
+        #         if any(filename.endswith(valid_scripts) for valid_scripts in ['server_start','init_custom']):
+        #             os.chmod(filepath, 0o755)
         return {"status" : "success"}
     except Exception as e:
         return {"status" : "error", "info" : f"Unable to configure permissions for server. {e}"}
