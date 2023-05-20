@@ -57,14 +57,15 @@ class Server(Resource):
                 if clean_on_fail:
                     shutil.rmtree(self.args['server_path'])
                 return self.args, 400 
+            if 'success' not in (result := server_create(server_uid))['status']: return result # type: ignore
             if 'start_later' in self.args and self.args['start_later']:
-                return server_create(server_uid)
+                return result, 200
             action='start'
         try:
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
         except Exception as e:
             logging.error(traceback.format_exc())
-            return {"status" : "error" , "info" : f"The server [{server_uid}] is inaccessible. Is the name valid? {e}" }, 404
+            return {"status" : "error" , "info" : f"Could not get the server [{server_uid}]. Is the name valid?", "exception" : f"{e}" }, 404
         if action == "start":
             result = scheduler_stop_request(server_uid,self.args)
             if "status" in result:
