@@ -89,12 +89,18 @@ def servers_get_all():
         servers.append(server_get_server(server))
     return servers
 
-def server_update_description(server, description):
-    logging.debug("Updating {0}.{1}'s description to [{2}]".format(
-        server['game_uid'], server['servername'], description))
-    with open("{0}/servers/{1}/{2}/description".format(root_path, server['game_uid'], server['servername']), 'w') as f:
-        f.write(description)
-    return {"status" : "success"}
+def server_update_description(server_uid, description):
+    try:
+        logging.debug(f"Updating {server_uid}'s description to [{description}]")
+        config_file = f"{server_root_path}/{server_uid.replace('.','/')}/config.json"
+        with open(config_file, 'r') as json_file:
+            server_config = json.load(json_file)
+        server_config['metadata']['description']=description
+        with open(config_file, 'w') as json_file:
+            json.dump(server_config, json_file, indent=4)
+        return {"status" : "success"}
+    except Exception as e:
+        return {"status" : "error", "info" : "Could not update the desciption of the server.", "exception" : f"{e}"}
 
 def docker_compose_do(action,server_uid):
     working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
