@@ -110,7 +110,7 @@ def server_create(server_uid):
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
-    return docker_compose_do(action="-d up",server_uid=server_uid)
+    return docker_compose_do(action="up -d",server_uid=server_uid)
 
 def server_stop(server_uid):
     logging.info("Stopping server [{0}]".format(server_uid))
