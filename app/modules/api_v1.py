@@ -147,9 +147,22 @@ class Plans(Resource):
     def put(self):
         logging.debug("APIv1 - Plans update List")
         if not authorized(request.headers): return "Not authorized", 401
-        if ( plans := get_plans_remote(config_peon=self.config_peon)): # type: ignore
-            return plans, 200
-        return "There was an issue getting the local plans list.", 404
+        #if ( plans := get_plans_remote(config_peon=self.config_peon)): # type: ignore
+        old_plans = get_plans_local(settings)
+        if 'success' not in ( result := update_latest_plans_from_repository())['status']: # type: ignore
+            return result, 404
+        new_plans = get_plans_local(settings)
+        differences = {}
+        for new_dict in new_plans:
+            game_uid = new_dict['game_uid']
+            found = False
+            for old_dict in old_plans:
+                if old_dict['game_uid'] == game_uid:
+                    found = True
+                    break
+            if not found:
+                differences[game_uid] = new_dict
+        return { "new_recipies" : differences }, 200
 
 class Plan(Resource):
     def __init__(self):
