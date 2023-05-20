@@ -100,7 +100,7 @@ def docker_compose_do(action,server_uid):
     working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
     try:
         execute_shell(f"cd {working_dir} && docker-compose {action}")
-        return {"status" : "success"}
+        return {"status" : "success", "info" : f"{server_uid}"}
     except:
         return {"status" : "error", "info" : f"Unable to run [docker-compose {action}] in path {working_dir}"}
 
