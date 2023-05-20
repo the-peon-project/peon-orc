@@ -68,11 +68,11 @@ class Server(Resource):
             return {"status" : "error" , "info" : f"Could not get the server [{server_uid}]. Is the name valid?", "exception" : f"{e}" }, 404
         if action == "start":
             result = scheduler_stop_request(server_uid,self.args)
-            if "status" in result:
+            if "response" in result:
                 result = server_start(server_uid)
         elif action == "stop":
             result = scheduler_stop_request(server_uid,self.args)
-            if "status" in result and result["status"] == "NOW":
+            if "response" in result and result["response"] == "NOW":
                 scheduler_remove_exisiting_stop(server_uid)
                 result = server_stop(server_uid)
         elif action == "restart":
@@ -99,21 +99,12 @@ class Server(Resource):
         if action not in ["destroy","eradicate"]:
             return {"error" : "Incorrect action [{0}] provided".format(action)}, 404
         if action == "destroy":
-            try:
-                server_get_server(client.containers.get(
-                    "{0}{1}".format(prefix, server_uid)))
-            except Exception as e:
-                logging.error(traceback.format_exc())
-                return {"status" : "error" , "info" : f"The server {server_uid} is inaccessible. Is the name valid? <{e}>"}, 404
-            server_stop(server_uid)
-            server_delete(server_uid)
-            note = "Server {0} was removed."
-        args = self.reqparse.parse_args()
-        if "eradicate" in args and args["eradicate"] == "True":
+            if 'success' not in ( result := server_delete(server_uid))['status']: return {"status" : "error", "info" : f"Failed to remove the server [{server_uid}].", "exception" : f"{result['exception']}"}, 404 # type: ignore
+            note = "Server {0} was removed. "
+        if "eradicate" in self.args and self.args["eradicate"] == "True":
             server_delete_files(server_uid)
             note = note + "All files for {0} have been removed."
-        return {"success": note.format(server_uid)}, 200
-
+        return {"status" : "success", "info" : note.format(server_uid)}, 200
 
 class Servers(Resource):
     def __init__(self):
