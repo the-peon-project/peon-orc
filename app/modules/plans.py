@@ -158,7 +158,7 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
         env_var_list.append(f"{env_var}={value}")
     manifest['services']['server']['environment']=env_var_list
     # Volumes
-    for source, target in config_warcamp['volumes'].items(): mount_list.append(f"./{source}:{target}")
+    for source, target in config_warcamp['volumes'].items(): mount_list.append(f"{source}:{target}")
     # Custom file mount
     if 'files' in config_warcamp:
         for source, target in config_warcamp['files'].items():
