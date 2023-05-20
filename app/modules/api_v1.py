@@ -17,7 +17,7 @@ class Server(Resource):
         if request.is_json:
             self.args = request.json
         else:
-            self.args = None
+            self.args = {}
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
