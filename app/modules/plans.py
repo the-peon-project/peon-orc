@@ -282,13 +282,14 @@ if __name__ == "__main__":
     logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_plans.log', filemode='a', format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     config_peon = json.load(open("/app/config.json", 'r'))
     # VRISING
-    #user_settings={
-    #    "game_uid"    : "vrising",
-    #    "description" : "A V Rising server",
-    #    "SERVER_NAME" : "countjugular",
-    #    "WORLD_NAME"  : "world1",
-    #    "PASSWORD"    : "rigrich"
-    #}
+    # user_settings={
+    #     "game_uid"    : "vrising",
+    #     "warcamp"     : "countjugular",
+    #     "description" : "A V Rising server",
+    #     "SERVER_NAME" : "countjugular",
+    #     "WORLD_NAME"  : "countjugular",
+    #     "PASSWORD"    : "Zu88Zu88"
+    # }
     # CSGO
     # user_settings={
     #     "game_uid"    : "csgo",
@@ -307,8 +308,14 @@ if __name__ == "__main__":
     # QUAKE 3
     # user_settings={
     #     "game_uid"    : "quake3",
-    #     "description" : "A quake3 erver"
+    #     "description" : "A quake3 server"
+    # }
+    # Satisfactory
+    # user_settings={
+    #     "game_uid"    : "satisfactory",
+    #     "description" : "A Satisfactory server",
+    #     "SERVER_NAME" : "N/A"
     # }
     # - - - - - 
     # server = create_new_warcamp(config_peon=config_peon,user_settings=user_settings)
-    #print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid=server['game_uid'],warcamp=server['warcamp'],user_friendly=True),indent=4))
+    # print(json.dumps(get_warcamp_config(config_peon=config_peon,game_uid=server['game_uid'],warcamp=server['warcamp'],user_friendly=True),indent=4))
