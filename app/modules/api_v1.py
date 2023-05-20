@@ -49,7 +49,7 @@ class Server(Resource):
                 server_uid=f"{self.args['game_uid']}.{self.args['warcamp']}"
         else:
             self.args['warcamp'] = server_uid_parts[1]
-        self.args['server_path']=f"/home/peon/servers/{self.args['game_uid']}/{self.args['warcamp']}"
+        self.args['server_path']=f"{settings['path']['servers']}/{self.args['game_uid']}/{self.args['warcamp']}"
         if action == "create":
             clean_on_fail = False
             if not os.path.isdir(self.args['server_path']): clean_on_fail = True
