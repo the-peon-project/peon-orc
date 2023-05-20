@@ -14,12 +14,10 @@ class Server(Resource):
     def __init__(self):
         # Initialize The Flask Request Parser and add arguments as in an expected request
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("game_uid", type=str, location="json")
-        self.reqparse.add_argument("servername", type=str, location="json")
-        self.reqparse.add_argument("description", type=str, location="json")
-        self.reqparse.add_argument("eradicate", type=str, location="json")
-        self.reqparse.add_argument("interval", type=str, location="json")
-        self.reqparse.add_argument("epoch_time", type=str, location="json")
+        if request.is_json:
+            self.args = request.json
+        else:
+            self.args = None
         super(Server, self).__init__()
 
     # GET - Returns a single server object given a matching id
@@ -41,23 +39,26 @@ class Server(Resource):
         logging.info("APIv1 - Server {0} - Action {1}".format(server_uid, action))
         result = { "status" : "success"}
         if not authorized(request.headers): return "Not authorized", 401
-        try:
-            args=self.reqparse.parse_args()
-        except:
-            args= {}
-            logging.debug("[API-Server-PUT] No arguments passed")
+        server_uid_parts = server_uid.split('.')
+        self.args['game_uid'] = server_uid_parts[0]
+        if len(server_uid_parts) < 2:
+            if 'create' not in action:
+                return {"status" : "error", "info" : f"For the requested action [{action}] a warcamp name is required. You only provided [{server_uid}]" }, 400
+            else:
+                self.args['warcamp'] = get_warcamp_name()
+                server_uid=f"{self.args['game_uid']}.{self.args['warcamp']}"
+        else:
+            self.args['warcamp'] = server_uid_parts[1]
+        self.args['server_path']=f"/home/peon/servers/{self.args['game_uid']}/{self.args['warcamp']}"
         if action == "create":
-            args['game_uid'], args['warcamp'] = server_uid.split('.', 1) if '.' in server_uid else (server_uid, get_warcamp_name())
-            args['server_path']=f"/home/peon/servers/{args['game_uid']}/{args['warcamp']}"
             clean_on_fail = False
-            if not os.path.isdir(args['server_path']): clean_on_fail = True
-            if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=args))['status']:  # type: ignore
+            if not os.path.isdir(self.args['server_path']): clean_on_fail = True
+            if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
                 if clean_on_fail:
-                    shutil.rmtree(args['server_path'])
-                return result, 400 
-            if 'start_later' in args and args['start_later']:
-                return result, 200
-            execute_shell(f"docker-compose -f {args['server_path']} create")
+                    shutil.rmtree(self.args['server_path'])
+                return self.args, 400 
+            if 'start_later' in self.args and self.args['start_later']:
+                return server_create(server_uid)
             action='start'
         try:
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
@@ -65,11 +66,11 @@ class Server(Resource):
             logging.error(traceback.format_exc())
             return {"status" : "error" , "info" : f"The server [{server_uid}] is inaccessible. Is the name valid? {e}" }, 404
         if action == "start":
-            result = scheduler_stop_request(server_uid,args)
+            result = scheduler_stop_request(server_uid,self.args)
             if "status" in result:
                 result = server_start(server_uid)
         elif action == "stop":
-            result = scheduler_stop_request(server_uid,args)
+            result = scheduler_stop_request(server_uid,self.args)
             if "status" in result and result["status"] == "NOW":
                 scheduler_remove_exisiting_stop(server_uid)
                 result = server_stop(server_uid)
@@ -116,12 +117,7 @@ class Server(Resource):
 class Servers(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            "game_uid", type=str, required=True, help="The PEON game id must be provided.", location="json")
-        self.reqparse.add_argument(
-            "servername", type=str, required=False, help="A custom server name must be provided.", location="json")
-        self.reqparse.add_argument(
-            "description", type=str, required=False, help="A server description can be provided", location="json")
+        
     # GET - List all servers
     def get(self):
         logging.debug("APIv1 - Servers Get/List")
