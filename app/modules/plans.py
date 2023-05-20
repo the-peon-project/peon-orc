@@ -196,9 +196,8 @@ def identify_available_port_group(config_peon,game_uid,warcamp):
 # WARCAMP FUNCTIONS
 def create_new_warcamp(config_peon,user_settings):
     game_uid=user_settings["game_uid"]
-    if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     warcamp=user_settings['warcamp']
-    server_path=f"{config_peon['path']['servers']}/{game_uid}/{warcamp}"
+    server_path=user_settings['server_path']
     # Check if there is already a plan in that directory
     try: 
         if (get_local_plan_definition(f"{server_path}/config.json")): return { "status" : "error" , "info" : f"There is already a config.json file for [{game_uid}] [{warcamp}]. Please run update on the game/server instead. (Can be added in a future release.)" }
