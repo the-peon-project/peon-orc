@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from flask import request
 from flask_restful import Resource, reqparse
-from modules import prefix
+from modules import prefix, settings
 from .servers import *
 from .plans import *
 from .security import *
@@ -47,16 +47,23 @@ class Server(Resource):
             args= {}
             logging.debug("[API-Server-PUT] No arguments passed")
         if action == "create":
-            # TODO - Implement server create
-            
-            action = "start"
-            return "Server create function is not yet implemented", 501
-        else:
-            try:
-                server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
-            except Exception as e:
-                logging.error(traceback.format_exc())
-                return {"status" : "error" , "info" : f"The server [{server_uid}] is inaccessible. Is the name valid? {e}" }, 404
+            args['game_uid'], args['warcamp'] = server_uid.split('.', 1) if '.' in server_uid else (server_uid, get_warcamp_name())
+            args['server_path']=f"/home/peon/servers/{args['game_uid']}/{args['warcamp']}"
+            clean_on_fail = False
+            if not os.path.isdir(args['server_path']): clean_on_fail = True
+            if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=args))['status']:  # type: ignore
+                if clean_on_fail:
+                    shutil.rmtree(args['server_path'])
+                return result, 400 
+            if 'start_later' in args and args['start_later']:
+                return result, 200
+            execute_shell(f"docker-compose -f {args['server_path']} create")
+            action='start'
+        try:
+            server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return {"status" : "error" , "info" : f"The server [{server_uid}] is inaccessible. Is the name valid? {e}" }, 404
         if action == "start":
             result = scheduler_stop_request(server_uid,args)
             if "status" in result:
