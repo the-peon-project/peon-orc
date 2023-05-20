@@ -50,6 +50,7 @@ class Server(Resource):
         else:
             self.args['warcamp'] = server_uid_parts[1]
         self.args['server_path']=f"{settings['path']['servers']}/{self.args['game_uid']}/{self.args['warcamp']}"
+        # CREATE
         if action == "create":
             clean_on_fail = False
             if not os.path.isdir(self.args['server_path']): clean_on_fail = True
@@ -57,36 +58,40 @@ class Server(Resource):
                 if clean_on_fail:
                     shutil.rmtree(self.args['server_path'])
                 return self.args, 400 
-            if 'success' not in (result := server_create(server_uid))['status']: return result # type: ignore
+            if 'success' not in (result := server_create(server_uid))['status']: return result, 400 # type: ignore
             if 'start_later' in self.args and self.args['start_later']:
                 return result, 200
             action='start'
+        # CHECK
         try:
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
         except Exception as e:
             logging.error(traceback.format_exc())
             return {"status" : "error" , "info" : f"Could not get the server [{server_uid}]. Is the name valid?", "exception" : f"{e}" }, 404
+        # START
         if action == "start":
-            result = scheduler_stop_request(server_uid,self.args)
-            if "response" in result:
-                result = server_start(server_uid)
+            if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
+            result = server_start(server_uid)
+        # STOP
         elif action == "stop":
             result = scheduler_stop_request(server_uid,self.args)
             if "response" in result and result["response"] == "NOW":
                 scheduler_remove_exisiting_stop(server_uid)
                 result = server_stop(server_uid)
+        # RESTART
         elif action == "restart":
-            server_restart(server_uid)
+            result = server_restart(server_uid)
+        # DESCRIPTION
         elif action == "description":
             try:
-                server_update_description(server, (self.reqparse.parse_args())["description"])
+                result = server_update_description(server_uid=server_uid, description=self.args["description"])
             except:
                 return {"status" : "error" , "info" : "The description argument was incorrectly provided."}, 400
         else:
             return {"status" : "error" , "info" : "Unsupported action [{0}].".format(action)}, 404
-        time.sleep(0.5)
-        server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
+        time.sleep(0.5) # Wait some time for the docker daemon to do some magic
         if "status" in result:
+            server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
             return server, 200
         else:
             return result, 400
