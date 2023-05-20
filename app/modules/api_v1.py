@@ -2,6 +2,7 @@
 from flask import request
 from flask_restful import Resource, reqparse
 from modules import prefix, settings
+from .peon import get_warcamp_name
 from .servers import *
 from .plans import *
 from .security import *
@@ -9,6 +10,7 @@ from .scheduler import *
 import logging
 import traceback
 import time
+import shutil
 
 class Server(Resource):
     def __init__(self):
@@ -162,6 +164,7 @@ class Plans(Resource):
                     break
             if not found:
                 differences[game_uid] = new_dict
+        configure_plan_permissions()
         return { "new_recipies" : differences }, 200
 
 class Plan(Resource):
