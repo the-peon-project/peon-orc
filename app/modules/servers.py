@@ -101,8 +101,8 @@ def docker_compose_do(action,server_uid):
     try:
         execute_shell(f"cd {working_dir} && docker-compose {action}")
         return {"status" : "success", "info" : f"{server_uid}"}
-    except:
-        return {"status" : "error", "info" : f"Unable to run [docker-compose {action}] in path {working_dir}"}
+    except Exception as e:
+        return {"status" : "error", "info" : f"Could not complete the requested action for [{server_uid}].", "exception" : f"{e}"}
 
 def server_create(server_uid):
     logging.info("Creating server [{0}]".format(server_uid))
@@ -125,8 +125,12 @@ def server_delete(server_uid):
     return docker_compose_do(action="down",server_uid=server_uid)
 
 def server_delete_files(server_uid):
-    execute_shell("rm -rf {0}/{1}".format(server_root_path, str(server_uid).replace(".", "/")))
-    return {"status" : "success"}
+    try:
+        working_dir=f"{server_root_path}/{server_uid.replace('.','/')}"
+        shutil.rmtree(working_dir)
+    except Exception as e:
+        logging.error(f"Could not delete files in [{working_dir}]. {e}")
+        
 
 def add_envs(env_vars, content):
     for key in content.keys():
