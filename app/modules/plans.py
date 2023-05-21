@@ -175,6 +175,10 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
             if os.path.exists(f"{server_path}/{source}"):
                 mount_list.append(f"./{source}:{target}")
     manifest['services']['server']['volumes']=mount_list
+    # User
+    manifest['services']['server']['user']="1000:1000"
+    # Restart Policy
+    manifest['services']['server']['restart']="unless-stopped"
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as f:
             yaml.dump(manifest, f, sort_keys=False, indent=4)
@@ -186,12 +190,6 @@ def configure_permissions(server_path): # chown & chmod on path
     try:
         execute_shell(cmd_as_string=f"chown -R 1000:1000 {server_path}")
         execute_shell(cmd_as_string=f"chmod 755 {server_path}/scripts/.")
-        # for filename in os.listdir(server_path):
-        #     filepath = os.path.join(server_path, filename)
-        #     if os.path.isfile(filepath):
-        #         os.chown(filepath, 1000, 1000)
-        #         if any(filename.endswith(valid_scripts) for valid_scripts in ['server_start','init_custom']):
-        #             os.chmod(filepath, 0o755)
         return {"status" : "success"}
     except Exception as e:
         return {"status" : "error", "info" : f"Unable to configure permissions for server. {e}"}
