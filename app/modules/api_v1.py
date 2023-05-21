@@ -60,9 +60,7 @@ class Server(Resource):
                 if clean_on_fail:
                     shutil.rmtree(self.args['server_path'])
                 return self.args, 400
-            if 'start_later' in self.args and self.args['start_later']:
-                if 'success' not in (result := server_create(server_uid))['status']: return result, 400 # type: ignore
-                else: return result, 200
+            if 'start_later' in self.args and self.args['start_later']: return result, 200
             else:
                 action = 'start'
         if action == "start":
