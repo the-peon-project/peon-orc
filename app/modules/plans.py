@@ -6,6 +6,7 @@ import requests
 import sys
 import shutil
 import glob
+import os
 sys.path.insert(0,'/app')
 from modules.github import *
 from modules.shell import execute_shell
@@ -168,12 +169,17 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
         env_var_list.append(f"{env_var}={value}")
     manifest['services']['server']['environment']=env_var_list
     # Volumes
-    for source, target in config_warcamp['volumes'].items(): mount_list.append(f"{source}:{target}")
+    host_server_path=server_path.replace(settings['path']['servers'],f"{os.environ.get('HOST_DIR')}/servers")
+    for source, target in config_warcamp['volumes'].items():
+        if '~!' in source: # Added to allow custom mount paths, but have to link to specific location on the host system
+            source = source.replace("~!", host_server_path)
+        mount_list.append(f"{source}:{target}")
     # Custom file mount
     if 'files' in config_warcamp:
         for source, target in config_warcamp['files'].items():
+            if '~!' in source: source = source.replace("~!/", "")
             if os.path.exists(f"{server_path}/{source}"):
-                mount_list.append(f"./{source}:{target}")
+                mount_list.append(f"host_server_path/{source}:{target}")
     manifest['services']['server']['volumes']=mount_list
     # User
     manifest['services']['server']['user']="1000:1000"
