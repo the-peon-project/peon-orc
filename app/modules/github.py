@@ -28,6 +28,7 @@ def update_plans_from_github(force=False):
         #repo = Repo(plan_path)
         #repo.remotes.origin.pull()
         # TEMP SOLUTION [START] - as python git is full of sh**
+        execute_shell(cmd_as_string=f'git config --global --add safe.directory {plan_path}')
         if force:
             execute_shell(cmd_as_string=f'cd {plan_path} && git reset --hard && git pull')
         else:
