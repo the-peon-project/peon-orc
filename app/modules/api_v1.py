@@ -64,16 +64,7 @@ class Server(Resource):
                 if 'success' not in (result := server_create(server_uid))['status']: return result, 400 # type: ignore
                 else: return result, 200
             else:
-                action='start'
-                if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
-                result = server_start(server_uid)
-        # CHECK
-        try:
-            server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            return {"status" : "error" , "info" : f"Could not get the server [{server_uid}]. Is the name valid?", "exception" : f"{e}" }, 404
-        # START
+                action = 'start'
         if action == "start":
             if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
             result = server_start(server_uid)
