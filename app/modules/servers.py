@@ -105,7 +105,7 @@ def server_update_description(server_uid, description):
 def docker_compose_do(action,server_uid):
     working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
     try:
-        execute_shell(f"cd {working_dir} && docker-compose {action}")
+        execute_shell(f"cd {working_dir} && docker compose {action}")
         return {"status" : "success", "info" : f"{server_uid}"}
     except Exception as e:
         return {"status" : "error", "info" : f"Could not complete the requested action for [{server_uid}].", "exception" : f"{e}"}
