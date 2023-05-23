@@ -32,5 +32,5 @@ if __name__ == "__main__":
     # load all registered servers into memory
     servers_get_all()
     # Start Orchestrator services
-    logging.debug(app.run(host="0.0.0.0", port=5000, debug=True)) # Setting DEBUG=true will make timer trigger x2
+    logging.debug(app.run(host="0.0.0.0", port=5000, debug=False)) # Setting DEBUG=true will make timer trigger x2
     logging.debug("[END]")
