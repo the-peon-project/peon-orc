@@ -28,7 +28,7 @@ if __name__ == "__main__":
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
     logging.debug("[START]")
     # Start the schedulers timer
-    # TODO scheduler_tick()
+    scheduler_tick()
     # load all registered servers into memory
     servers_get_all()
     # Start Orchestrator services
