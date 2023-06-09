@@ -298,26 +298,26 @@ if __name__ == "__main__":
     # VRISING
     # user_settings={
     #     "game_uid"    : "vrising",
-    #     "warcamp"     : "countjugular",
+    #     "warcamp"     : "vrsingsun",
     #     "description" : "A V Rising server",
-    #     "SERVER_NAME" : "countjugular",
-    #     "WORLD_NAME"  : "countjugular",
-    #     "PASSWORD"    : "Zu88Zu88"
+    #     "SERVER_NAME" : "vrsingsun",
+    #     "WORLD_NAME"  : "vrsingsun",
+    #     "PASSWORD"    : "MeatOnTheMenu"
     # }
     # CSGO
     # user_settings={
     #     "game_uid"    : "csgo",
     #     "description" : "A CSGO server",
     #     "SERVER_NAME" : "fightnight",
-    #     "STEAM_GSLT"  : "29FAFDA08BF87A432AD77316C352C430",
+    #     "STEAM_GSLT"  : "29FAFDA01234567890123416C352C430",
     # }
     # VALHEIM
     # user_settings={
     #      "game_uid"    : "valheim",
     #      "description" : "A Valheim server",
-    #      "SERVER_NAME" : "richington",
-    #      "WORLD_NAME"  : "richington",
-    #      "PASSWORD"    : "Zu88Zu88"
+    #      "SERVER_NAME" : "valserv",
+    #      "WORLD_NAME"  : "myworld",
+    #      "PASSWORD"    : "Shmeep"
     #  }
     # QUAKE 3
     # user_settings={
