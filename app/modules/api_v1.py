@@ -60,7 +60,7 @@ class Server(Resource):
             if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
                 if clean_on_fail:
                     shutil.rmtree(self.args['server_path'])
-                return self.args, 400
+                return result, 400
             if 'start_later' in self.args and self.args['start_later']: return result, 200
             else:
                 logging.debug("create.03. Creation complete. Enabling server start.")
