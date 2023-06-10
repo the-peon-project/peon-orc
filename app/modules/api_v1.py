@@ -53,26 +53,26 @@ class Server(Resource):
         self.args['server_path']=f"{settings['path']['servers']}/{self.args['game_uid']}/{self.args['warcamp']}"
         # CREATE
         if action == "create":
-            logging.debug("[create][01] Check if there are preloaded server files.")
+            logging.debug("create.01. Check if there are preloaded server files.")
             clean_on_fail = False
             if not os.path.isdir(self.args['server_path']): clean_on_fail = True
-            logging.debug("[create][02] Trigger [create_new_warcamp] with with settings.")
+            logging.debug("create.02. Trigger [create_new_warcamp] with with settings.")
             if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
                 if clean_on_fail:
                     shutil.rmtree(self.args['server_path'])
                 return self.args, 400
             if 'start_later' in self.args and self.args['start_later']: return result, 200
             else:
-                logging.debug("[create][03] Creation complete. Enabling server start.")
+                logging.debug("create.03. Creation complete. Enabling server start.")
                 action = 'start'
         if action == "start":
-            logging.debug("[start][01] Check and configure server shutdown time.")
+            logging.debug("start.01. Check and configure server shutdown time.")
             if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
-            logging.debug(f"[start][02] Trigger the startup of the server.")
+            logging.debug(f"start.02. Trigger the startup of the server.")
             result = server_start(server_uid)
         # STOP
         elif action == "stop":
-            logging.debug("[stop][01] Check if automated shutdown is being requested server shutdown time.")
+            logging.debug("stop.01. Check if automated shutdown is being requested server shutdown time.")
             result = scheduler_stop_request(server_uid,self.args)
             if "response" in result and result["response"] == "NOW":
                 logging.debug(f"[stop][02] Triggering server shutdown.")
@@ -80,12 +80,12 @@ class Server(Resource):
                 result = server_stop(server_uid)
         # RESTART
         elif action == "restart":
-            logging.debug("[restart][01] Restarting server.")
+            logging.debug("restart.01. Restarting server.")
             result = server_restart(server_uid)
         # DESCRIPTION
         elif action == "description":
             try:
-                logging.debug(f"[description][01] Updating the server description.")
+                logging.debug(f"description.01. Updating the server description.")
                 result = server_update_description(server_uid=server_uid, description=self.args["description"])
             except:
                 return {"status" : "error" , "info" : "The description argument was incorrectly provided."}, 400
