@@ -39,6 +39,7 @@ class Server(Resource):
     def put(self, action, server_uid):
         logging.info(f"APIv1 [PUT] server <{action}> <{server_uid}>")
         result = { "status" : "success"}
+        clean_on_fail = False
         if not authorized(request.headers): return "Not authorized", 401
         server_uid_parts = server_uid.split('.')
         self.args['game_uid'] = server_uid_parts[0]
@@ -54,17 +55,14 @@ class Server(Resource):
         # CREATE
         if action == "create":
             logging.debug("create.01. Check if there are preloaded server files.")
-            clean_on_fail = False
             if not os.path.isdir(self.args['server_path']): clean_on_fail = True
             logging.debug("create.02. Trigger [create_new_warcamp] with with settings.")
-            if 'success' not in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
-                if clean_on_fail:
-                    shutil.rmtree(self.args['server_path'])
-                return result, 400
-            if 'start_later' in self.args and self.args['start_later']: return result, 200
-            else:
-                logging.debug("create.03. Creation complete. Enabling server start.")
-                action = 'start'
+            if 'success' in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
+                if 'start_later' in self.args and self.args['start_later']:
+                    logging.info("create.03. Server created successfully. No-start flag set.")
+                else:
+                    logging.debug("create.03. Server created successfully.")
+                    action = 'start'
         # START
         if action == "start":
             logging.debug("start.01. Check and configure server shutdown time.")
@@ -98,6 +96,8 @@ class Server(Resource):
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
             return server, 200
         else:
+            if clean_on_fail:
+                shutil.rmtree(self.args['server_path'])
             return result, 400
 
     # DELETE - Remove a server
