@@ -114,12 +114,12 @@ class Server(Resource):
         if action == "destroy":
             logging.debug(f"Removing the server container environment.")
             if 'success' not in ( result := server_delete(server_uid))['status']: return {"status" : "error", "info" : f"Failed to remove the server [{server_uid}].", "exception" : f"{result['exception']}"}, 404 # type: ignore
-            note = "Server {0} was removed. "
-        if "eradicate" in self.args and self.args["eradicate"] == "True":
+            note = f"Server {server_uid} was removed. "
+        if "eradicate" in self.args and self.args["eradicate"]:
             logging.debug(f"Removing the server & user data from the filesystem.")
             server_delete_files(server_uid)
-            note = note + "All files for {0} have been removed."
-        return {"status" : "success", "info" : note.format(server_uid)}, 200
+            note = note + f"All files for {server_uid} have been removed from file system."
+        return {"status" : "success", "info" : note}, 200
 
 class Servers(Resource):
     def __init__(self):
