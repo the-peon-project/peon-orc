@@ -4,7 +4,7 @@ import subprocess
 import logging
 
 def execute_shell( cmd_as_string, show_console=False ):
-    logging.info('[execute_shell] - {0}'.format(cmd_as_string))
+    logging.debug(f"execute_shell. {cmd_as_string}")
     # Run the shell command and return the result in human readable
     response = subprocess.check_output(cmd_as_string, shell=True).decode("utf-8")
     # Convert the result into a list (based on the newline character)
@@ -17,5 +17,5 @@ def execute_shell( cmd_as_string, show_console=False ):
         print("> " + cmd_as_string)
         print (response)
         print("-----------------------")
-    logging.debug('[execute_shell] - response: {0}'.format(output))
+    logging.debug('execute_shell.response. {0}'.format(output))
     return output
