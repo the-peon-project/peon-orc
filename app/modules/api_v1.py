@@ -65,6 +65,7 @@ class Server(Resource):
             else:
                 logging.debug("create.03. Creation complete. Enabling server start.")
                 action = 'start'
+        # START
         if action == "start":
             logging.debug("start.01. Check and configure server shutdown time.")
             if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
@@ -92,7 +93,7 @@ class Server(Resource):
         else:
             return {"status" : "error" , "info" : "Unsupported action [{0}].".format(action)}, 404
         time.sleep(0.5) # Wait some time for the docker daemon to do some magic
-        if "status" in result:
+        if "success" in result["status"]:
             logging.debug(f"Fetching the status of the server.")
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
             return server, 200
