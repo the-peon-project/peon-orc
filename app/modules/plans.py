@@ -62,7 +62,7 @@ def get_plans_local(config_peon):
     try:
         with open(f"{config_peon['path']['plans']}/plans.json") as json_file:
             plans = json.load(json_file)
-        return plans
+        return sorted(plans, key=lambda x: x["title"])
     except Exception as e:
         logging.error(f"[get_plans_local] Could not get the local plans file. {e}")
         return None
