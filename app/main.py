@@ -6,6 +6,7 @@ from flask_restful import Api
 from modules.api_v1 import *
 from modules.servers import *
 from modules.scheduler import *
+from modules.shared import configure_logging
 from modules import *
 # Configure CORS (secure http/s requests)
 from flask_cors import CORS
@@ -24,8 +25,8 @@ api_v1.add_resource(Plan, "/api/1.0/plan/<string:game_uid>")
 
 # Start flask listener
 if __name__ == "__main__":
-    logging.basicConfig(filename='/var/log/peon/orc.log', filemode='a',
-                        format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    # Configure logging
+    configure_logging('/var/log/peon/bot.discord.log')
     logging.debug("[START]")
     # Start the schedulers timer
     scheduler_tick()
