@@ -26,7 +26,7 @@ api_v1.add_resource(Plan, "/api/1.0/plan/<string:game_uid>")
 # Start flask listener
 if __name__ == "__main__":
     # Configure logging
-    configure_logging('/var/log/peon/bot.discord.log')
+    configure_logging()
     logging.debug("[START]")
     # Start the schedulers timer
     scheduler_tick()

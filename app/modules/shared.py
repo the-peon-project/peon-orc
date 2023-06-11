@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 def configure_logging():
     # Set up logging to stdout
