@@ -59,6 +59,7 @@ class Server(Resource):
             logging.debug("create.02. Trigger [create_new_warcamp] with with settings.")
             if 'success' in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
                 if 'start_later' in self.args and self.args['start_later']:
+                    action = 'skip'
                     logging.info("create.03. Server created successfully. No-start flag set.")
                 else:
                     logging.debug("create.03. Server created successfully.")
@@ -88,6 +89,8 @@ class Server(Resource):
                 result = server_update_description(server_uid=server_uid, description=self.args["description"])
             except:
                 return {"status" : "error" , "info" : "The description argument was incorrectly provided."}, 400
+        elif action == "skip":
+            logging.debug("skip.01. Skip additional actions requested.")
         else:
             return {"status" : "error" , "info" : "Unsupported action [{0}].".format(action)}, 404
         time.sleep(0.5) # Wait some time for the docker daemon to do some magic
