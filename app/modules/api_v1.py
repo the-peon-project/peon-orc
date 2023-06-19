@@ -59,8 +59,8 @@ class Server(Resource):
             logging.debug("create.02. Trigger [create_new_warcamp] with with settings.")
             if 'success' in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
                 if 'start_later' in self.args and self.args['start_later']:
-                    action = 'skip'
                     logging.info("create.03. Server created successfully. No-start flag set.")
+                    return {"status" : "success" , "info" : f"The server files for [{self.args['warcamp']}] were created, but the server was not started, in accordance with the provided settings."}, 200
                 else:
                     logging.debug("create.03. Server created successfully.")
                     action = 'start'
