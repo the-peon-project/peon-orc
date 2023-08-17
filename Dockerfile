@@ -9,7 +9,7 @@ RUN echo "cat /etc/motd" >> /etc/bash.bashrc
 # OS: Prepare the OS and middleware
 RUN apt-get update
 # DOCKER
-RUN apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release subversion
+RUN apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release subversion bsdmainutils
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
@@ -23,6 +23,10 @@ RUN apt-get -y install procps iputils-ping dnsutils vim
 COPY ./app /app
 WORKDIR /app
 ENV PATH="/app/bin:${PATH}"
+RUN echo "/home/peon/servers/" > /app/bin/config/peon_dir
+# BACKWARDS COMPATIBILITY
+RUN echo "alias docker-compose='docker compose'" >> /etc/bash.bashrc
+RUN echo "alias docker-compose='docker compose'" >> /etc/profile
 # VERSION
 ARG VERSION
 ENV VERSION=${VERSION}
