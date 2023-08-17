@@ -92,7 +92,9 @@ class Server(Resource):
         elif action == "skip":
             logging.debug("skip.01. Skip additional actions requested.")
         else:
-            return {"status" : "error" , "info" : "Unsupported action [{0}].".format(action)}, 404
+            if result['info']: info = result['info']
+            else: info = f"Unsupported action [{action}]."
+            return { "status" : "error" , "info" : info }, 404
         time.sleep(0.5) # Wait some time for the docker daemon to do some magic
         if "success" in result["status"]:
             logging.debug(f"Fetching the status of the server.")
