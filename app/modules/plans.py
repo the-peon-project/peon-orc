@@ -88,13 +88,16 @@ def configure_plan_permissions():
 
 # LOCAL PLAN FUNCTIONS
 def get_local_plan_definition(file_path):
-    try: 
-        if os.path.isfile(file_path):
-            with open(file_path) as json_file:
-                game_plan = json.load(json_file)    
-        return game_plan
+    try:
+        with open(file_path) as json_file:
+            game_plan = json.load(json_file)
+            return game_plan
+    except FileNotFoundError:
+        logging.error(f"get_local_plan_definition.nok. The plan file '{file_path}' does not exist.")
+    except json.JSONDecodeError as e:
+        logging.error(f"get_local_plan_definition.nok. The file '{file_path}' is not valid JSON. Error: {e}")
     except Exception as e:
-        logging.debug(f"get_local_plan_definition.nok The plan definition file [{file_path}] was not found. {e}")
+        logging.error(f"get_local_plan_definition.nok. An error occurred: {e}")
     return None
 
 def get_all_required_settings(config_peon,game_uid):
@@ -222,7 +225,7 @@ def create_new_warcamp(config_peon,user_settings):
     try: 
         if (get_local_plan_definition(f"{server_path}/config.json")): return { "status" : "error" , "info" : f"There is already a config.json file for [{game_uid}] [{warcamp}]. Please run update on the game/server instead. (Can be added in a future release.)" }
     except:
-        logging.debug("create_warcamp.01. No pre-existing server config found.")
+        logging.error("create_warcamp.01. No pre-existing server config found.")
     # Get default plan definition
     logging.debug("create_warcamp.02. Collect plan definition from plan path.")
     if not (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no local default plan for {game_uid}."}  # type: ignore
