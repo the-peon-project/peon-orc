@@ -100,8 +100,8 @@ def get_local_plan_definition(file_path):
 def get_all_required_settings(config_peon,game_uid):
     try:
         if (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")):  # type: ignore
+            if plan['metadata']['description'] == "": plan['metadata']['description'] = f"A PEON game server for {game_uid}."
             settings = plan['environment']
-            settings['description'] = f"A PEON game server for {game_uid}."
             required = {}
             optional = {}
             for key, value in settings.items():
@@ -110,6 +110,7 @@ def get_all_required_settings(config_peon,game_uid):
                         optional[key] = f"{value}"
                     else: required[key] = ""
             required.update(optional)
+            required.update({ "description" : plan['metadata']['description']})
             return required
     except Exception as e:
         logging.error(f"[get_all_required_settings] An issue occured getting the required settings for {game_uid}. <{e}>")
