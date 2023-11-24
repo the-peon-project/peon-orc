@@ -115,6 +115,15 @@ def server_create(server_uid):
     logging.info("Creating server [{0}]".format(server_uid))
     return docker_compose_do(action='create',server_uid=server_uid)
 
+def server_update(server_uid):
+    logging.info("Updating server [{0}]".format(server_uid))
+    docker_compose_do(action="stop",server_uid=server_uid)
+    update_flag = f"{server_root_path}/{server_uid.replace('.','/')}/actions/.update"
+    if os.path.exists(update_flag):
+        os.remove(update_flag)
+    print("File deleted successfully.")
+    return docker_compose_do(action="up -d",server_uid=server_uid)
+
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
     return docker_compose_do(action="up -d",server_uid=server_uid)

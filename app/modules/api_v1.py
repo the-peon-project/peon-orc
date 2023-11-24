@@ -63,6 +63,10 @@ class Server(Resource):
                 else:
                     logging.debug("create.03. Server created successfully.")
                     action = 'start'
+        # UPDATE
+        if action == "update":
+            logging.debug("update.01. Running update sequence.")
+            result = server_update(server_uid)
         # START
         if action == "start":
             logging.debug("start.01. Check and configure server shutdown time.")
