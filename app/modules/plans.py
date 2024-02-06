@@ -52,7 +52,7 @@ def update_latest_plans_from_repository(repo='github', force=True):
 def get_remote_plan_version(config_peon,game_uid):
     try:
         game_plan_url = config_peon['settings']['plan_url'].format(game_uid)
-        if (response := requests.get(game_plan_url)).status_code == 200: # type: ignore
+        if (response := requests.get(game_plan_url)).status_code == 200:
             return (json.loads(response.content))['metadata']['version']
     except Exception as e:
             logging.warning(f"[get_remote_plan_version] A plan definition file for [{game_uid}] was not found at [{game_plan_url}]. {e}")
@@ -102,7 +102,7 @@ def get_local_plan_definition(file_path):
 
 def get_all_required_settings(config_peon,game_uid):
     try:
-        if (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")):  # type: ignore
+        if (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): 
             if plan['metadata']['description'] == "": plan['metadata']['description'] = f"A PEON game server for {game_uid}."
             settings = plan['environment']
             required = {}
@@ -120,7 +120,7 @@ def get_all_required_settings(config_peon,game_uid):
     return None
 
 def get_required_settings(config_peon,game_uid,warcamp):
-    if (plan := get_local_plan_definition(f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json")):  # type: ignore
+    if (plan := get_local_plan_definition(f"{config_peon['path']['servers']}/{game_uid}/{warcamp}/config.json")): 
         return ([key for key, value in plan['environment'].items() if value is None])
     else:
         return None
@@ -201,6 +201,7 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
 
 def configure_permissions(server_path): # chown & chmod on path
     try:
+        execute_shell(cmd_as_string=f"mkdir {server_path}/actions {server_path}/config {server_path}/data {server_path}/user")
         execute_shell(cmd_as_string=f"chown -R 1000:1000 {server_path}")
         execute_shell(cmd_as_string=f"chmod 755 {server_path}/scripts/.")
         return {"status" : "success"}
@@ -228,7 +229,7 @@ def create_new_warcamp(config_peon,user_settings):
         logging.error("create_warcamp.01. No pre-existing server config found.")
     # Get default plan definition
     logging.debug("create_warcamp.02. Collect plan definition from plan path.")
-    if not (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no local default plan for {game_uid}."}  # type: ignore
+    if not (plan := get_local_plan_definition(f"{config_peon['path']['plans']}/{game_uid}/plan.json")): return {"status" : "error", "info" : f"There is no local default plan for {game_uid}."} 
     # Create new game directory, if required
     logging.debug("create_warcamp.03. Create a directory for the game server.")
     if not os.path.exists(f"{config_peon['path']['servers']}/{game_uid}"):
@@ -239,14 +240,14 @@ def create_new_warcamp(config_peon,user_settings):
     logging.debug("create_warcamp.04. Colate user settings with plan default settings.")
     if "warcamp" not in user_settings: user_settings['warcamp'] = get_warcamp_name()
     plan['metadata']['warcamp'] = user_settings['warcamp']
-    if "success" not in (result := consolidate_settings(config_peon=config_peon,user_settings=user_settings,plan=plan))['status']: return result  # type: ignore
+    if "success" not in (result := consolidate_settings(config_peon=config_peon,user_settings=user_settings,plan=plan))['status']: return result
     plan=result['plan']
-    if "success" not in (result := identify_available_port_group(config_peon=config_peon,game_uid=game_uid,warcamp=warcamp))['status']: return result # type: ignore
+    if "success" not in (result := identify_available_port_group(config_peon=config_peon,game_uid=game_uid,warcamp=warcamp))['status']: return result
     plan['ports'] = result['open_ports']
     with open(f'{server_path}/config.json', 'w') as f:
         json.dump(plan, f, indent=4)
     logging.debug("create_warcamp.05. Create server specific config file.")
-    if "success" not in (result := update_build_file(server_path=server_path,config_warcamp=plan))['status']: return result  # type: ignore
+    if "success" not in (result := update_build_file(server_path=server_path,config_warcamp=plan))['status']: return result 
     logging.debug("create_warcamp.06. Configure file permissions.")
     if "success" not in configure_permissions(server_path=server_path)['status']: return result
     return {"status" : "success", "game_uid" : f"{game_uid}", "warcamp" : f"{warcamp}", "server_path" : f"{server_path}" }

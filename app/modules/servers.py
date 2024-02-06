@@ -105,7 +105,7 @@ def server_update_description(server_uid, description):
 def docker_compose_do(action,server_uid):
     working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
     try:
-        result = execute_shell(f"cd {working_dir} && docker compose {action}")
+        result = execute_shell(f"cd {working_dir} && sudo chown -R 1000:1000 . && docker compose {action}")
         return {"status" : "success", "info" : f"{server_uid}", "stdout" : f"{result}"}
     except Exception as e:
         logging.error(f"docker_compose_do.nok. {e}")
@@ -126,6 +126,7 @@ def server_update(server_uid):
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
+    
     return docker_compose_do(action="up -d",server_uid=server_uid)
 
 def server_stop(server_uid):

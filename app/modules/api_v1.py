@@ -56,7 +56,7 @@ class Server(Resource):
             logging.debug("create.01. Check if there are preloaded server files.")
             if not os.path.isdir(self.args['server_path']): clean_on_fail = True
             logging.debug("create.02. Trigger [create_new_warcamp] with with settings.")
-            if 'success' in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']:  # type: ignore
+            if 'success' in (result := create_new_warcamp(config_peon=settings,user_settings=self.args))['status']: 
                 if 'start_later' in self.args and self.args['start_later']:
                     logging.info("create.03. Server created successfully. No-start flag set.")
                     return {"status" : "success" , "info" : f"The server files for [{self.args['warcamp']}] were created, but the server was not started, in accordance with the provided settings."}, 200
@@ -70,7 +70,7 @@ class Server(Resource):
         # START
         if action == "start":
             logging.debug("start.01. Check and configure server shutdown time.")
-            if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400 # type: ignore
+            if "response" not in (result := scheduler_stop_request(server_uid,self.args)): return result, 400
             logging.debug(f"start.02. Trigger the startup of the server.")
             result = server_start(server_uid)
         # STOP
@@ -121,7 +121,7 @@ class Server(Resource):
             return {"error" : "Incorrect action [{0}] provided".format(action)}, 404
         if action == "destroy":
             logging.debug(f"Removing the server container environment.")
-            if 'success' not in ( result := server_delete(server_uid))['status']: return {"status" : "error", "info" : f"Failed to remove the server [{server_uid}].", "exception" : f"{result['exception']}"}, 404 # type: ignore
+            if 'success' not in ( result := server_delete(server_uid))['status']: return {"status" : "error", "info" : f"Failed to remove the server [{server_uid}].", "exception" : f"{result['exception']}"}, 404
             note = f"Server {server_uid} was removed. "
         if "eradicate" in self.args and self.args["eradicate"]:
             logging.debug(f"Removing the server & user data from the filesystem.")
@@ -157,7 +157,7 @@ class Plans(Resource):
     def get(self):
         logging.info(f"APIv1 [GET] plans")
         if not authorized(request.headers): return "Not authorized", 401
-        if ( plans := get_plans_local(config_peon=self.config_peon)): # type: ignore
+        if ( plans := get_plans_local(config_peon=self.config_peon)):
             return plans, 200
         return "There was an issue getting the local plans list.", 404
 
@@ -165,9 +165,9 @@ class Plans(Resource):
     def put(self):
         logging.info(f"APIv1 [PUT] plans <update>")
         if not authorized(request.headers): return "Not authorized", 401
-        #if ( plans := get_plans_remote(config_peon=self.config_peon)): # type: ignore
+        #if ( plans := get_plans_remote(config_peon=self.config_peon)):
         old_plans = get_plans_local(settings)
-        if 'success' not in ( result := update_latest_plans_from_repository())['status']: # type: ignore
+        if 'success' not in ( result := update_latest_plans_from_repository())['status']:
             return result, 404
         new_plans = get_plans_local(settings)
         differences = {}
@@ -191,6 +191,6 @@ class Plan(Resource):
     def get(self,game_uid):
         logging.info(f"APIv1 [GET] plans <{game_uid}>")
         if not authorized(request.headers): return "Not authorized", 401
-        if ( settings := get_all_required_settings(config_peon=self.config_peon,game_uid=game_uid)): return settings, 200 # type: ignore
+        if ( settings := get_all_required_settings(config_peon=self.config_peon,game_uid=game_uid)): return settings, 200
         else: return f"Could not get the settings for [{game_uid}]" , 404
             
