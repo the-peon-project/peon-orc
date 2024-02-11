@@ -152,7 +152,7 @@ def server_backup(server_uid):
     try:
         working_dir = f"{server_root_path}/{server_uid.replace('.', '/')}"
         zip_path = f"/home/peon/backup/{server_uid}-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}.zip"
-        execute_shell(f"zip -r {zip_path} {working_dir} -x '*data/*'")
+        execute_shell(f"cd {working_dir} && zip -r {zip_path} . -x '*data/*'")
         return zip_path
     except Exception as e:
         logging.error(f"Could not back up [{working_dir}]. {e}")
