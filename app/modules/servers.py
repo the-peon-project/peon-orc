@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 import logging
-import traceback
 import json
 from pathlib import Path
 import sys
+import datetime
 sys.path.insert(0,'/app')
 from modules import client, prefix, schedule_file
 from modules.shell import execute_shell
@@ -147,7 +147,21 @@ def server_delete_files(server_uid):
         shutil.rmtree(working_dir)
     except Exception as e:
         logging.error(f"Could not delete files in [{working_dir}]. {e}")
-        
+
+def server_backup(server_uid):
+    try:
+        working_dir = f"{server_root_path}/{server_uid.replace('.', '/')}"
+        zip_path = f"/home/peon/backup/{server_uid}-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}.zip"
+        execute_shell(f"zip -r {zip_path} {working_dir} -x '*data/*'")
+        return zip_path
+    except Exception as e:
+        logging.error(f"Could not back up [{working_dir}]. {e}")
+
+def server_download_files(server_uid):
+    try:
+        return server_backup(server_uid=server_uid)
+    except Exception as e:
+        logging.error(f"Could not get server content for [{server_uid}]. {e}")
 
 def add_envs(env_vars, content):
     for key in content.keys():
