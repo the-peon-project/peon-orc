@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from flask import request
+from flask import request, send_file
 from flask_restful import Resource, reqparse
 from modules import prefix, settings
 from .peon import get_warcamp_name
@@ -29,6 +29,9 @@ class Server(Resource):
             server = server_get_server(client.containers.get("{0}{1}".format(prefix, server_uid)))
             if action == "stats":
                 server["stats"] = server_get_stats(server_uid)
+            elif action == "save":
+                file_path = server_download_files(server_uid)
+                return send_file(file_path, as_attachment=True)
             return server, 200
         except Exception as e:
             logging.error(f"Failed to get server information. {e}")
