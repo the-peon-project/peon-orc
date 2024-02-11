@@ -74,7 +74,7 @@ def get_plans_remote(config_peon):
             f.write(response.content)
         return get_plans_local(config_peon=config_peon)
     except Exception as e:
-        logging.error(f"[get_plans_remote] There was an issue getting the latest plans from the Github repo. {e}")
+        logging.error(f"[get_plans_remote] There was an issue getting the latest plans from the GitHub repo. {e}")
         return None
 
 def configure_plan_permissions():
