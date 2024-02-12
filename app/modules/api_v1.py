@@ -138,10 +138,16 @@ class Servers(Resource):
 
     # GET - List all servers
     def get(self):
-        logging.info(f"APIv1 [GET] servers")
+        logging.info(f"APIv1 [GET] servers - list all servers")
         if not authorized(request.headers): return "Not authorized", 401
         servers = servers_get_all()
         return servers, 200
+    
+    def put(self):
+        logging.info(f"APIv1 [PUT] servers - import")
+        if not authorized(request.headers): return "Not authorized", 401
+        servers_import()
+        return servers_get_all(), 200
 
 class Plans(Resource):
     def __init__(self):

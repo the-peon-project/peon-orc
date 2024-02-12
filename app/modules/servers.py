@@ -163,6 +163,18 @@ def server_download_files(server_uid):
     except Exception as e:
         logging.error(f"Could not get server content for [{server_uid}]. {e}")
 
+def servers_import():
+    # Walk through the directory
+    base_path = "/home/peon/servers"
+    for root, dirs, files in os.walk(base_path):
+        # Split the root directory into parts
+        parts = root.split(os.sep)
+        # Check if the length of parts is equal to the length of base_path plus 2
+        # This indicates a second level folder
+        if len(parts) == len(base_path.split(os.sep)) + 2:
+            execute_shell(f"cd {root} && docker compose up --no-start")
+    
+
 def add_envs(env_vars, content):
     for key in content.keys():
         env_vars[key] = content[key]
