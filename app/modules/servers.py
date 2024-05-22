@@ -172,7 +172,7 @@ def servers_import():
         # Check if the length of parts is equal to the length of base_path plus 2
         # This indicates a second level folder
         if len(parts) == len(base_path.split(os.sep)) + 2:
-            execute_shell(f"cd {root} && docker compose up --no-start")
+            execute_shell(f"cd {root} && docker compose create")
     
 
 def add_envs(env_vars, content):
