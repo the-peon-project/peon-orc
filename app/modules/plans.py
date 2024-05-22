@@ -148,7 +148,6 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
     env_var_list = []
     mount_list = []
     # Metadata
-    manifest['version'] = "3"
     manifest['services'] = {
         'server': {
             'container_name': config_warcamp['metadata']['container_name'],
