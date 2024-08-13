@@ -2,7 +2,7 @@
 FROM python:3.11-slim-bullseye
 # CONTAINER: Configuration
 LABEL "com.peon.description"="Peon Orchestrator"
-LABEL "maintainer"="Umlatt <richard@noxnoctua.com>"
+LABEL "maintainer"="Umlatt <richard@lazylionconsulting.com>"
 # BRANDING: Copy branding into container
 COPY ./media/banner /etc/motd
 RUN echo "cat /etc/motd" >> /etc/bash.bashrc
