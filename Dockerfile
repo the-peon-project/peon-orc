@@ -29,6 +29,7 @@ RUN mkdir /app/bin/config && echo "/home/peon/servers/" > /app/bin/config/peon_d
 RUN echo "alias docker-compose='docker compose'" >> /etc/bash.bashrc
 RUN echo "alias docker-compose='docker compose'" >> /etc/profile
 # VERSION
+ENV CONTAINER_TYPE="orchestrator"
 ARG VERSION
 ENV VERSION=${VERSION}
 RUN echo VERSION=${VERSION} >> /etc/environment
