@@ -23,7 +23,7 @@ RUN apt-get -y install procps iputils-ping dnsutils vim
 COPY ./app /app
 WORKDIR /app
 ENV PATH="/app/bin:${PATH}"
-# Requires peon-cli/bin to be mounted into build directory
+# BUILD ERROR NOTE: Requires peon-cli/bin to be mounted into ./app build directory (e.g. `/home/USER/development/peon-cli/bin /home/USER/development/peon-orc/app/bin none bind 0 0`)
 RUN mkdir /app/bin/config && echo "/home/peon/servers/" > /app/bin/config/peon_dir 
 # BACKWARDS COMPATIBILITY
 RUN echo "alias docker-compose='docker compose'" >> /etc/bash.bashrc
