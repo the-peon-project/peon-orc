@@ -4,7 +4,7 @@ FROM python:3.11-slim-bullseye
 LABEL "com.peon.description"="Peon Orchestrator"
 LABEL "maintainer"="Umlatt <richard@lazylionconsulting.com>"
 # BRANDING: Copy branding into container
-COPY ./media/banner /etc/motd
+COPY ./media/motd /etc/motd
 RUN echo "cat /etc/motd" >> /etc/bash.bashrc
 # OS: Prepare the OS and middleware
 RUN apt-get update
