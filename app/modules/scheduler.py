@@ -34,7 +34,7 @@ def schedule_add_event(server_uid, epoch_time, action="stop"):
             "action" : action
         }))
         schedule_write_to_disk(schedule)
-        return { "response" : "Added scheduled event." }
+        return { "status" : "success", "response" : "Added scheduled event." }
     except:
         return { "error" : f"An error occured when scheduling the [{action}] event." }
 
