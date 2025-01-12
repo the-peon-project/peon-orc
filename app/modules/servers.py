@@ -31,6 +31,8 @@ def schedule_read_from_disk():
         return []
 
 def server_get_server(server):
+    container_type = 'unknown'
+    build_version = 'unknown'
     server_full_uid = (server.name).split('.')
     server_path=f"{server_root_path}/{server_full_uid[2]}/{server_full_uid[3]}"
     try:            
@@ -39,10 +41,13 @@ def server_get_server(server):
         description = config_data['metadata']['description']
     except:
         description = "None - Please add a description"        
+
+    server_state = server.status
+    server_config = {}
     try:
-        server_state = server.status
-        server_config = {}
         if server.status == "running":
+            container_type=execute_shell(f"docker exec {server.name} printenv CONTAINER_TYPE")[0]
+            build_version=execute_shell(f"docker exec {server.name} printenv VERSION")[0]
             for filename in os.listdir(f"{server_path}/config/"):
                 if os.path.isdir(os.path.join(f"{server_path}/config/", filename)):
                     continue
@@ -62,6 +67,8 @@ def server_get_server(server):
     server = {
         'game_uid': server_full_uid[2],
         'servername': server_full_uid[3],
+        'container_type': container_type,
+        'build_version': build_version,
         'container_state': server.status,
         'server_state': server_state,
         'server_config': dict(server_config),
