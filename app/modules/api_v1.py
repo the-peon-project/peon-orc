@@ -10,6 +10,31 @@ from .scheduler import *
 import logging
 import time
 import shutil
+import os
+
+class Orchestrator(Resource):
+    def __init__(self):
+        # Initialize The Flask Request Parser and add arguments as in an expected request
+        self.reqparse = reqparse.RequestParser()
+        if request.is_json:
+            self.args = request.json
+        else:
+            self.args = {}
+        super(Orchestrator, self).__init__()
+
+    # GET - Returns a single server object given a matching id
+    def get(self):
+        logging.info(f"APIv1 [GET] Orchestrator")
+        if not authorized(request.headers): return "Not authorized", 401
+        try:
+            payload = {}
+            version = os.environ.get("VERSION", "-.-.-")
+            payload["version"] = version
+            return payload, 200
+        except Exception as e:
+            logging.error(f"Failed to get Orchestrator information. {e}")
+            return {"status" : "error" , "info" : "There was an issue getting the Orchestrator information."}, 404
+
 
 class Server(Resource):
     def __init__(self):
