@@ -9,7 +9,7 @@ import re
 from datetime import datetime
 from dateutil.relativedelta import *
 from modules import schedule_file
-from modules.servers import server_start, server_stop, server_restart
+from modules.servers import server_start, server_stop, server_restart, servers_get_all
 
 interval = 30 # Seconds
 
@@ -76,12 +76,36 @@ def scheduler_delete_event(list_index):
     schedule_write_to_disk(schedule)
     return { "response" : "Removed scheduled event." }
 
+def filter_schedule(schedule, servers):
+    server_lookup = {
+        f"{server['game_uid']}.{server['servername']}": server
+        for server in servers
+    }
+    filtered_schedule = []
+    for entry in schedule:
+        server_uid = entry["server_uid"]
+        action = entry["action"]
+        if server_uid not in server_lookup:
+            continue
+        server = server_lookup[server_uid]
+        container_state = server.get("container_state", "")
+        if action == "stop" and container_state == "exited":
+            continue
+        if action == "start" and container_state == "running":
+            continue
+        filtered_schedule.append(entry)
+    return filtered_schedule
+
 def scheduler_tick():
     now = int(time.mktime(datetime.today().timetuple()))
     schedule_changes=False
     schedule=schedule_read_from_disk()
     new_schedule=[]
     # Process the schedule
+    new_schedule = filter_schedule(schedule, servers_get_all())
+    if schedule != new_schedule:
+        schedule_changes=True
+        schedule = new_schedule
     for item in schedule:
         if int(item["time"]) <= now:
             if item["action"] == "start":
