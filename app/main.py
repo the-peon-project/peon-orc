@@ -18,6 +18,7 @@ app = Flask(__name__)
 CORS(app, allow_headers=cors_allowed_headers, methods=cors_allowed_methods)
 api_v1 = Api(app)
 
+api_v1.add_resource(Orchestrator, "/api/v1/orchestrator")
 api_v1.add_resource(Servers, "/api/v1/servers")
 api_v1.add_resource(Server, "/api/v1/server/<string:action>/<string:server_uid>")
 api_v1.add_resource(Plans, "/api/v1/plans")
