@@ -105,7 +105,7 @@ def server_update_description(server_uid, description):
 def docker_compose_do(action,server_uid):
     working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
     try:
-        result = execute_shell(f"cd {working_dir} && chown -R 1000:1000 . && docker compose {action}")
+        result = execute_shell(f"cd {working_dir} && chown -R 1000:1000 . && docker compose -p {server_uid.replace('.','_')} {action}")
         return {"status" : "success", "info" : f"{server_uid}", "stdout" : f"{result}"}
     except Exception as e:
         logging.error(f"docker_compose_do.nok. {e}")
