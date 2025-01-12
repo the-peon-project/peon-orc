@@ -189,8 +189,8 @@ def update_build_file(server_path,config_warcamp): # Take a config and create a 
     manifest['services']['server']['volumes']=mount_list
     # User
     manifest['services']['server']['user']="1000:1000"
-    # # Restart Policy
-    # manifest['services']['server']['restart']="unless-stopped"
+    manifest['services']['server']['networks']=["zugnet"]
+    manifest['networks']={"zugnet":{"name":f"{server_path.split('/')[-2]}_{server_path.split('/')[-1]}"}}
     try:
         with open(f"{server_path}/docker-compose.yml", "w") as f:
             yaml.dump(manifest, f, sort_keys=False, indent=4)
