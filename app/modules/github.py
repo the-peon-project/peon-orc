@@ -19,7 +19,7 @@ def get_plans_from_github():
     
 def update_plans_from_github(force=False):
     if not os.listdir(plan_path): # Check if the plans currently exist
-        logging.warn(f"[update_plans_from_github] No plans found. Downloading plans from [{repo_url}]")
+        logging.warning(f"[update_plans_from_github] No plans found. Downloading plans from [{repo_url}]")
         if "success" not in (result := get_plans_from_github()['status']): return result
     else: { "status" : "success" }
     try:
