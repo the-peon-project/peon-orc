@@ -111,7 +111,7 @@ class Server(Resource):
                 if 'noclean' in self.args and self.args['noclean']:
                     logging.info("Do not clean on failure flag was set.")
                 else:
-                    logging.warn(f"Removing server {server_uid} folder from filesystem.")
+                    logging.warning(f"Removing server {server_uid} folder from filesystem.")
                     shutil.rmtree(self.args['server_path'])
             return result, 400
 
