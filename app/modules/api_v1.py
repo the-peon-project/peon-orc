@@ -129,7 +129,7 @@ class Server(Resource):
         if "eradicate" in self.args and self.args["eradicate"]:
             logging.debug(f"Removing the server & user data from the filesystem.")
             server_delete_files(server_uid)
-            note = note + f"All files for {server_uid} have been removed from file system."
+            note = note + f"All files for {server_uid} will be purged from the server. This may take a few moments."
         return {"status" : "success", "info" : note}, 200
 
 class Servers(Resource):
