@@ -113,6 +113,8 @@ def docker_compose_do(action,server_uid):
 
 def server_create(server_uid):
     logging.info("Creating server [{0}]".format(server_uid))
+    working_dir = f"{server_root_path}/{server_uid.replace('.','/')}"
+    execute_shell(f'[ -d "{working_dir}" ] || mkdir -p "{working_dir}"')
     return docker_compose_do(action='create',server_uid=server_uid)
 
 def server_update(server_uid):
@@ -172,9 +174,9 @@ def servers_import():
         # Check if the length of parts is equal to the length of base_path plus 2
         # This indicates a second level folder
         if len(parts) == len(base_path.split(os.sep)) + 2:
-            execute_shell(f"cd {root} && docker compose -p {f"{root.split('/')[-2]}_{root.split('/')[-1]}"} create")
+            docker_project = f"{root.split('/')[-2]}_{root.split('/')[-1]}"
+            execute_shell(f"cd {root} && docker compose -p {docker_project} create")
     
-
 def add_envs(env_vars, content):
     for key in content.keys():
         env_vars[key] = content[key]
