@@ -119,7 +119,14 @@ def server_port_check(server_uid):
             for port in exposed_ports[container]:
                 if "".join([char for char in port if char.isdigit()]) in ports:
                     logging.debug(f"Server [{server_uid}] cannot start because port [{port}] is in use by [{container}]")
-                    result =  {"status" : "error", "info" : f'Server [{".".join(container.split(".")[-2:])}] is using one or more of the ports required by [{server_uid}]'}
+                    try:
+                        container_uid = ".".join(container.split(".")[-2:])
+                    except:
+                        container_uid = container
+                    if server_uid != container_uid:
+                        result =  {"status" : "error", "info" : f'Server [{container_uid}] is using one or more of the ports required by [{server_uid}]'}
+                    else:
+                        result = {"status" : "success", "data" : "Server is already running."}
     except Exception as e:
         result = { "status" : "error", "exception" : f"{e}" }
     return result
@@ -171,12 +178,13 @@ def server_update(server_uid):
     update_flag = f"{server_root_path}/{server_uid.replace('.','/')}/actions/.update"
     if os.path.exists(update_flag):
         os.remove(update_flag)
-    print("File deleted successfully.")
+        logging.debug(".update flag file removed successfully.")
+    if (result := server_port_check(server_uid))['status'] != 'success': return result
     return docker_compose_do(action="up -d",server_uid=server_uid)
 
 def server_start(server_uid):
     logging.info("Starting server [{0}]".format(server_uid))
-    
+    if (result := server_port_check(server_uid))['status'] != 'success': return result
     return docker_compose_do(action="up -d",server_uid=server_uid)
 
 def server_stop(server_uid):
