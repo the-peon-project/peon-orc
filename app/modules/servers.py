@@ -124,7 +124,7 @@ def server_port_check(server_uid):
                     except:
                         container_uid = container
                     if server_uid != container_uid:
-                        result =  {"status" : "error", "info" : f'Server [{container_uid}] is using one or more of the ports required by [{server_uid}]'}
+                        result =  {"status" : "error", "info" : f'Server [{container_uid}] is using one or more of the ports required by [{server_uid}]', 'err_code' : 'srv.portsused' }
                     else:
                         result = {"status" : "success", "data" : "Server is already running."}
     except Exception as e:
