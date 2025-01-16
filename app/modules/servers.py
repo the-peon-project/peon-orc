@@ -134,6 +134,7 @@ def servers_get_all():
             game_servers.append(game_server)
     for server in game_servers:
         servers.append(server_get_server(server))
+    servers = sorted( servers,key=lambda x: (x["game_uid"], x["servername"]) )
     return servers
 
 def server_update_description(server_uid, description):
