@@ -94,7 +94,9 @@ class Server(Resource):
         # UPDATE
         if action == "update":
             logging.debug("update.01. Running update sequence.")
-            result = server_update(server_uid)
+            if (result := server_update(server_uid))['status'] != "success": return result, 400
+            else: return result, 200
+            
         # START
         if action == "start":
             logging.debug("start.01. Check and configure server shutdown time.")
