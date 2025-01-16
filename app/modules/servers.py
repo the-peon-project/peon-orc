@@ -84,6 +84,46 @@ def server_check(server_uid):
     except:
         return "error"
 
+def get_exposed_ports():
+    logging.debug("Getting exposed ports for all containers")
+    exposed_ports = {}
+    try:
+        containers = client.containers.list(all=True)
+        for container in containers:
+            container_info = container.attrs
+            ports = container_info['NetworkSettings']['Ports']
+            exposed_ports[container.name] = ports
+    except Exception as e:
+        logging.error(f"Error getting exposed ports: {e}")
+        return {"status": "error", "info": "Could not retrieve exposed ports.", "exception": str(e)}
+    return exposed_ports
+
+def server_port_check(server_uid):
+    logging.debug("Checking if server can start")
+    try:
+        # Step 1: Load docker-compose file into dict and check used ports
+        rootpath=f"{server_root_path}/{server_uid.replace('.','/')}"
+        result = {"status" : "success"}
+        current_config=f"{rootpath}/docker-compose.yml"
+        # Step 2: Check if the ports are currently in use
+        with open(current_config, 'r') as file:
+            config_data = yaml.load(file, Loader=yaml.FullLoader)
+        ports = []
+        for service in config_data['services']:
+            try:
+                ports.append(config_data['services'][service]['ports'][0].split(":")[0])
+            except:
+                pass
+        exposed_ports = get_exposed_ports()
+        for container in exposed_ports:
+            for port in exposed_ports[container]:
+                if "".join([char for char in port if char.isdigit()]) in ports:
+                    logging.debug(f"Server [{server_uid}] cannot start because port [{port}] is in use by [{container}]")
+                    result =  {"status" : "error", "info" : f'Server [{".".join(container.split(".")[-2:])}] is using one or more of the ports required by [{server_uid}]'}
+    except Exception as e:
+        result = { "status" : "error", "exception" : f"{e}" }
+    return result
+
 def servers_get_all():
     logging.debug("Checking existing servers")
     servers = []
@@ -182,7 +222,9 @@ def servers_import():
         # This indicates a second level folder
         if len(parts) == len(base_path.split(os.sep)) + 2:
             docker_project = f"{root.split('/')[-2]}_{root.split('/')[-1]}"
-            execute_shell(f"cd {root} && docker compose -p {docker_project} create")
+            # Check if there is a file called `docker-compose.yml` in the root directory
+            if "docker-compose.yml" in files:
+                execute_shell(f"cd {root} && docker compose -p {docker_project} create")
     
 def add_envs(env_vars, content):
     for key in content.keys():
@@ -199,6 +241,12 @@ def file_txt(path, content):
 
 # MAIN - for dev purposes
 if __name__ == "__main__":
-    logging.basicConfig(filename='/var/log/peon/DEV.peon.orc_actions_servers.log', filemode='a',
+    logging.basicConfig(filename='/var/log/DEV.peon.orc_actions_servers.log', filemode='a',
                         format='%(asctime)s %(thread)d [%(levelname)s] - %(message)s', level=logging.DEBUG)
+    print("------------------")
     print(servers_get_all())
+    print("------------------")
+    print(get_exposed_ports())
+    print("------------------")
+    print(server_port_check('enshrouded.minesofazhul'))
+    print("------------------")
