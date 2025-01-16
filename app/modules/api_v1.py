@@ -95,7 +95,7 @@ class Server(Resource):
         if action == "update":
             if 'mode' in self.args: mode = self.args['mode']
             logging.debug("update.01. Running update sequence.")
-            if (result := server_update(server_uid),mode.lower())['status'] != "success": return result, 400
+            if (result := server_update(server_uid,mode.lower()))['status'] != "success": return result, 400
             else: return result, 200
         # START
         if action == "start":
