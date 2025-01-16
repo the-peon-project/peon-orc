@@ -172,13 +172,16 @@ def server_create(server_uid):
     execute_shell(f'[ -d "{working_dir}" ] || mkdir -p "{working_dir}"')
     return docker_compose_do(action='create',server_uid=server_uid)
 
-def server_update(server_uid):
+def server_update(server_uid,mode='full'):
     logging.info("Updating server [{0}]".format(server_uid))
     docker_compose_do(action="stop",server_uid=server_uid)
-    update_flag = f"{server_root_path}/{server_uid.replace('.','/')}/actions/.update"
-    if os.path.exists(update_flag):
-        os.remove(update_flag)
-        logging.debug(".update flag file removed successfully.")
+    if mode in ['full','all','image','container']:
+        docker_compose_do(action="pull",server_uid=server_uid)
+    if mode in ['full','all','server','game']:
+        update_flag = f"{server_root_path}/{server_uid.replace('.','/')}/actions/.update"
+        if os.path.exists(update_flag):
+            os.remove(update_flag)
+            logging.debug(".update flag file removed successfully.")
     if (result := server_port_check(server_uid))['status'] != 'success': return result
     return docker_compose_do(action="up -d",server_uid=server_uid)
 
