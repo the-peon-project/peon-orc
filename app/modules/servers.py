@@ -213,7 +213,7 @@ def server_delete_files(server_uid,server_only=False):
     try:
         working_dir=f"{server_root_path}/{server_uid.replace('.','/')}"
         if server_only:
-            shutil.rmtree(f"{working_dir}/data/*")
+            execute_shell(f'rm -rf {working_dir}/data/*')  
         else:
             shutil.rmtree(working_dir)
     except Exception as e:
