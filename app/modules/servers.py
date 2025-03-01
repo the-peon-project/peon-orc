@@ -176,10 +176,13 @@ def server_update(server_uid,mode='full'):
     logging.info("Updating server [{0}]".format(server_uid))
     docker_compose_do(action="stop",server_uid=server_uid)
     logging.debug(f"update mode {mode}")
-    if mode in ['full','all','image','container']:
+    if mode == 'reinit':
+        logging.debug("Reinitializing server")
+        server_delete_files(server_uid,server_only=True)
+    if mode in ['reinit','full','all','image','container']:
         logging.debug("Pulling docker image")
         docker_compose_do(action="pull",server_uid=server_uid)
-    if mode in ['full','all','server','game']:
+    if mode in ['reinit','full','all','server','game']:
         logging.debug("Updating server files")
         update_flag = f"{server_root_path}/{server_uid.replace('.','/')}/actions/.update"
         if os.path.exists(update_flag):
@@ -206,10 +209,13 @@ def server_delete(server_uid):
     logging.info("Deleting server [{0}]".format(server_uid))
     return docker_compose_do(action="down",server_uid=server_uid)
 
-def server_delete_files(server_uid):
+def server_delete_files(server_uid,server_only=False):
     try:
         working_dir=f"{server_root_path}/{server_uid.replace('.','/')}"
-        shutil.rmtree(working_dir)
+        if server_only:
+            shutil.rmtree(f"{working_dir}/data/*")
+        else:
+            shutil.rmtree(working_dir)
     except Exception as e:
         logging.error(f"Could not delete files in [{working_dir}]. {e}")
 
