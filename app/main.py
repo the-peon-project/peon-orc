@@ -2,6 +2,7 @@
 import logging
 from flask import Flask
 from flask_restful import Api
+from werkzeug.serving import run_simple
 # Import Peon Modules
 from modules.api_v1 import *
 from modules.servers import *
@@ -13,8 +14,19 @@ from flask_cors import CORS
 cors_allowed_headers = ["Content-Type", "api_key", "Authorization"]
 cors_allowed_methods = ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"]
 
+# Configure logging first
+configure_logging()
+# Use logging instead of print for consistency
+logging.info("[START]")
+
+# Disable Flask default logging
+cli = sys.modules['flask.cli']
+cli.show_server_banner = lambda *x: None
+
 # # Initialize Flask
 app = Flask(__name__)
+app.logger.handlers = []  # Remove default handlers
+app.logger.propagate = True  # Use root logger
 CORS(app, allow_headers=cors_allowed_headers, methods=cors_allowed_methods)
 api_v1 = Api(app)
 
@@ -26,13 +38,10 @@ api_v1.add_resource(Plan, "/api/v1/plan/<string:game_uid>")
 
 # Start flask listener
 if __name__ == "__main__":
-    # Configure logging
-    configure_logging()
-    logging.debug("[START]")
     # Start the schedulers timer
     scheduler_tick()
     # load all registered servers into memory
     servers_get_all()
     # Start Orchestrator services
-    app.run(host="0.0.0.0", port=5000, debug=False) # Setting DEBUG=true will make timer trigger x2 # DEBUG LOGGING CAN BE ENABLED WITH THE `.env` ENTRY `DEV_MODE=enabled`
+    run_simple('0.0.0.0', 5000, app, use_reloader=False)
     logging.debug("[END]")
