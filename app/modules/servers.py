@@ -173,7 +173,7 @@ def server_create(server_uid):
     return docker_compose_do(action='create',server_uid=server_uid)
 
 def server_update(server_uid,mode='full'):
-    logging.info("Updating server [{0}]".format(server_uid))
+    logging.info(f"Updating server [{server_uid}] (update type = {mode})")
     docker_compose_do(action="stop",server_uid=server_uid)
     logging.debug(f"update mode {mode}")
     if mode == 'reinit':
