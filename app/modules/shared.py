@@ -3,18 +3,21 @@ import sys
 import os
 
 def configure_logging():
-    # Set up logging to stdout
+    # Clear any existing handlers to avoid duplicates
     root_logger = logging.getLogger()
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    root_logger.addHandler(stdout_handler)
-
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
     # Set the log format and level
     log_format = '%(asctime)s %(thread)d [%(levelname)s] %(message)s'
     log_level = logging.DEBUG if os.environ.get('DEV_MODE', 'disabled') == 'enabled' else logging.INFO
-
-    # Configure logging to append to Docker container logs
+    
+    # Configure the root logger with a single stdout handler
     logging.basicConfig(
         level=log_level,
         format=log_format,
-        handlers=[stdout_handler]
+        handlers=[logging.StreamHandler(sys.stdout)]
     )
+    
+    # Verify configuration with a debug message
+    logging.debug(f"Logging configured with level: {logging.getLevelName(log_level)}")
