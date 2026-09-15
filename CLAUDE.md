@@ -1,3 +1,10 @@
+> **⚠️ DEPRECATED — moved to the `peon` monorepo.** This repo's content now lives at
+> `peon/services/orc` (full history preserved via `git subtree`). See
+> `/home/richard/development/peon/services/orc/CLAUDE.md` for the current guide. This repo is
+> archived and read-only.
+
+---
+
 # PEON Orchestrator Guide
 
 This repo owns the core PEON orchestration API. It is the control plane that other services depend on.

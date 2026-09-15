@@ -1,3 +1,12 @@
+> **⚠️ DEPRECATED — moved to the `peon` monorepo**
+>
+> This repository has been consolidated into [`peon`](https://github.com/the-peon-project/peon) at
+> [`peon/services/orc`](https://github.com/the-peon-project/peon/tree/main/services/orc), with full
+> commit history preserved via `git subtree`. This repo is archived and read-only — make new changes
+> in `peon/services/orc` instead.
+
+---
+
 # The *PEON* project (FOSS)
 
 [![PEON](https://github.com/the-peon-project/.github/blob/main/media/images/peon-logo.png)](http://www.warcamp.org)
